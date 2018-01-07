@@ -48,6 +48,11 @@ class Beatmap {
 
     this.colours = []
 
+    this.events = {
+      background: null,
+      breaks: []
+    }
+
     this.hitObjects = []
     this.timingPoints = []
   }
@@ -65,7 +70,7 @@ class Beatmap {
     let hitObjectsLines = []
     let lines = body.split('\n').map(v => v.trim()) // Cache this for better performance of the loop
     for (let line of lines) {
-      if (line.startsWith('\\\\')) continue // Ignore comments
+      if (line.startsWith('//')) continue // Ignore comments
       if (!line) continue // Empty lines can pewf
       if (!section && line.includes('osu file format v')) { // get the version of the beatmap
         beatmap.version = parseInt(line.split('osu file format v')[1], 10) // Parse only as an int
@@ -211,6 +216,14 @@ class Beatmap {
           let [, value] = line.split(':').map(v => v.trim())
           beatmap.colours.push(new Colour(...value.split(',')))
           break
+        case 'Events':
+          let [type, ...params] = line.split(',')
+          if (type === '0') {
+            beatmap.events.background = params[1].replace(/"/g, '')
+          } else if (type === '2') {
+            beatmap.events.breaks.push({start: parseInt(params[0], 10), end: parseInt(params[1], 10)})
+          }
+          break
       }
     }
     return beatmap
@@ -230,6 +243,7 @@ class Beatmap {
     beatmap.editor = {...beatmap.editor, ...data.editor}
     beatmap.colours = data.colours ? data.colours.map(c => new Colour(...c)) : []
     beatmap.timingPoints = data.timingPoints || []
+    beatmap.events = {...beatmap.events, ...data.events}
     return beatmap
   }
 }
