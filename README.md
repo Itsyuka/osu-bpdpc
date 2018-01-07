@@ -21,13 +21,13 @@ npm i osu-bpdpc
 and require inside your javascript file
 
 ```javascript
-const OsuBPDPC = require('osu-bpdpc');
+const Beatmap = require('osu-bpdpc');
 ```
 
 or for specific elements using selective require
 
 ```javascript
-const {Beatmap} = require('osu-bpdpc');
+const {Colour} = require('osu-bpdpc');
 ```
 
 ## License
