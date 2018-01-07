@@ -1,0 +1,34 @@
+{
+  "name": "osu-bpdpc",
+  "version": "0.0.1",
+  "description": "Osu beatmap parser, difficulty and performance calculator",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha src/**/*.spec.js"
+  },
+  "keywords": [
+    "osu!",
+    "osu",
+    "osu! beatmap",
+    "beatmap",
+    "parser",
+    "calculator"
+  ],
+  "author": "Dillon Modine-Thuen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Itsyuka/osu-bpdpc.git"
+  },
+  "devDependencies": {
+    "eslint": "^4.15.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "mocha": "^4.1.0",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
