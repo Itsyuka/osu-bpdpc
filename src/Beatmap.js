@@ -1,60 +1,61 @@
 const Colour = require('./Colour')
+const Crunch = require('./utils/OsuCruncher')
 
 class Beatmap {
   constructor () {
-    this.version = 0
+    this.Version = 0
 
-    this.general = {
-      audioFilename: null,
-      audioLeadIn: 0,
-      previewTime: 0,
-      countdown: false,
-      sampleSet: 'None', // None, Normal, Soft, etc
-      stackLeniency: 0,
-      mode: 0,
-      letterboxInBreaks: false,
-      widescreenStoryboard: false
+    this.General = {
+      AudioFilename: null,
+      AudioLeadIn: 0,
+      PreviewTime: 0,
+      Countdown: false,
+      SampleSet: 'None', // None, Normal, Soft, etc
+      StackLeniency: 0,
+      Mode: 0,
+      LetterboxInBreaks: false,
+      WidescreenStoryboard: false
     }
 
-    this.difficulty = {
-      hpDrainRate: 0,
-      circleSize: 0,
-      overallDifficulty: 0,
-      approachRate: 0,
-      sliderMultiplier: 0,
-      sliderTickRate: 0
+    this.Difficulty = {
+      HPDrainRate: 0,
+      CircleSize: 0,
+      OverallDifficulty: 0,
+      ApproachRate: 0,
+      SliderMultiplier: 0,
+      SliderTickRate: 0
     }
 
-    this.editor = {
-      bookmarks: [],
-      distanceSpacing: 0,
-      beatDivisor: 0,
-      gridSize: 0,
-      timelineZoom: 0
+    this.Editor = {
+      Bookmarks: [],
+      DistanceSpacing: 0,
+      BeatDivisor: 0,
+      GridSize: 0,
+      TimelineZoom: 0
     }
 
-    this.metadata = {
-      title: null,
-      titleUnicode: null,
-      artist: null,
-      artistUnicode: null,
-      creator: null,
-      version: null,
-      source: null,
-      tags: [],
-      beatmapId: 0,
-      beatmapSetId: 0
+    this.Metadata = {
+      Title: null,
+      TitleUnicode: null,
+      Artist: null,
+      ArtistUnicode: null,
+      Creator: null,
+      Version: null,
+      Source: null,
+      Tags: [],
+      BeatmapID: 0,
+      BeatmapSetID: 0
     }
 
-    this.colours = []
+    this.Colours = []
 
-    this.events = {
-      background: null,
-      breaks: []
+    this.Events = {
+      Background: null,
+      Breaks: []
     }
 
-    this.hitObjects = []
-    this.timingPoints = []
+    this.HitObjects = []
+    this.TimingPoints = []
   }
 
   /**
@@ -73,7 +74,7 @@ class Beatmap {
       if (line.startsWith('//')) continue // Ignore comments
       if (!line) continue // Empty lines can pewf
       if (!section && line.includes('osu file format v')) { // get the version of the beatmap
-        beatmap.version = parseInt(line.split('osu file format v')[1], 10) // Parse only as an int
+        beatmap.Version = parseInt(line.split('osu file format v')[1], 10) // Parse only as an int
         continue
       }
       if (/^\s*\[(.+?)\]\s*$/.test(line)) {
@@ -85,31 +86,31 @@ class Beatmap {
           let [key, value] = line.split(':').map(v => v.trim())
           switch (key) {
             case 'AudioFilename':
-              beatmap.general.audioFilename = value
+              beatmap[section][key] = value
               break
             case 'AudioLeadIn':
-              beatmap.general.audioLeadIn = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
             case 'PreviewTime':
-              beatmap.general.previewTime = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
             case 'Countdown':
-              beatmap.general.countdown = value === '1'
+              beatmap[section][key] = value === '1'
               break
             case 'SampleSet':
-              beatmap.general.sampleSet = value
+              beatmap[section][key] = value
               break
             case 'StackLeniency':
-              beatmap.general.stackLeniency = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'Mode':
-              beatmap.general.mode = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
             case 'LetterboxInBreaks':
-              beatmap.general.letterboxInBreaks = value === '1'
+              beatmap[section][key] = value === '1'
               break
             case 'WidescreenStoryboard':
-              beatmap.general.widescreenStoryboard = value === '1'
+              beatmap[section][key] = value === '1'
               break
           }
           break
@@ -118,19 +119,19 @@ class Beatmap {
           let [key, value] = line.split(':').map(v => v.trim())
           switch (key) {
             case 'Bookmarks':
-              beatmap.editor.bookmarks = value.split(',').map(v => parseInt(v, 10))
+              beatmap[section][key] = value.split(',').map(v => parseInt(v, 10))
               break
             case 'DistanceSpacing':
-              beatmap.editor.distanceSpacing = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'BeatDivisor':
-              beatmap.editor.beatDivisor = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
             case 'GridSize':
-              beatmap.editor.gridSize = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
             case 'TimelineZoom':
-              beatmap.editor.timelineZoom = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
           }
           break
@@ -139,34 +140,34 @@ class Beatmap {
           let [key, value] = line.split(':').map(v => v.trim())
           switch (key) {
             case 'Title':
-              beatmap.metadata.title = value
+              beatmap[section][key] = value
               break
             case 'TitleUnicode':
-              beatmap.metadata.titleUnicode = value
+              beatmap[section][key] = value
               break
             case 'Artist':
-              beatmap.metadata.artist = value
+              beatmap[section][key] = value
               break
             case 'ArtistUnicode':
-              beatmap.metadata.artistUnicode = value
+              beatmap[section][key] = value
               break
             case 'Creator':
-              beatmap.metadata.creator = value
+              beatmap[section][key] = value
               break
             case 'Version':
-              beatmap.metadata.version = value
+              beatmap[section][key] = value
               break
             case 'Source':
-              beatmap.metadata.source = value
+              beatmap[section][key] = value
               break
             case 'Tags':
-              beatmap.metadata.tags = value.split(' ')
+              beatmap[section][key] = value.split(' ')
               break
             case 'BeatmapID':
-              beatmap.metadata.beatmapId = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
             case 'BeatmapSetID':
-              beatmap.metadata.beatmapSetId = parseInt(value, 10)
+              beatmap[section][key] = parseInt(value, 10)
               break
           }
           break
@@ -175,22 +176,22 @@ class Beatmap {
           let [key, value] = line.split(':').map(v => v.trim())
           switch (key) {
             case 'HPDrainRate':
-              beatmap.difficulty.hpDrainRate = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'CircleSize':
-              beatmap.difficulty.circleSize = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'OverallDifficulty':
-              beatmap.difficulty.overallDifficulty = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'ApproachRate':
-              beatmap.difficulty.approachRate = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'SliderMultiplier':
-              beatmap.difficulty.sliderMultiplier = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
             case 'SliderTickRate':
-              beatmap.difficulty.sliderTickRate = parseFloat(value)
+              beatmap[section][key] = parseFloat(value)
               break
           }
           break
@@ -200,7 +201,7 @@ class Beatmap {
           break
         case 'TimingPoints': {
           let args = line.split(',')
-          beatmap.timingPoints.push({
+          beatmap.TimingPoints.push({
             time: parseInt(args[0], 10),
             beatLength: parseFloat(args[1]),
             meter: args.length >= 2 ? parseInt(args[2]) : 4,
@@ -214,19 +215,67 @@ class Beatmap {
         }
         case 'Colours':
           let [, value] = line.split(':').map(v => v.trim())
-          beatmap.colours.push(new Colour(...value.split(',')))
+          beatmap.Colours.push(new Colour(...value.split(',')))
           break
         case 'Events':
           let [type, ...params] = line.split(',')
           if (type === '0') {
-            beatmap.events.background = params[1].replace(/"/g, '')
+            beatmap.Events.Background = params[1].replace(/"/g, '')
           } else if (type === '2') {
-            beatmap.events.breaks.push({start: parseInt(params[0], 10), end: parseInt(params[1], 10)})
+            beatmap.Events.Breaks.push({start: parseInt(params[0], 10), end: parseInt(params[1], 10)})
           }
           break
       }
     }
     return beatmap
+  }
+
+  /**
+   * Outputs as an .osu file format
+   * @returns {String}
+   */
+  toOsu () {
+    let data = []
+    data.push(`osu file format v${this.Version}`)
+    data.push('')
+    data.push('[General]')
+    for (let key in this.General) {
+      data.push(Crunch(key, this.General[key]))
+    }
+    data.push('')
+    data.push('[Editor]')
+    for (let key in this.Editor) {
+      data.push(Crunch(key, this.Editor[key]))
+    }
+    data.push('')
+    data.push('[Metadata]')
+    for (let key in this.Metadata) {
+      data.push(Crunch(key, this.Metadata[key]))
+    }
+    data.push('')
+    data.push('[Difficulty]')
+    for (let key in this.Difficulty) {
+      data.push(Crunch(key, this.Difficulty[key]))
+    }
+    data.push('')
+    data.push('[Colours]')
+    for (let colour in this.Colours) {
+      data.push(`Combo${parseInt(colour, 10) + 1}: ${this.Colours[colour].toString()}`)
+    }
+    data.push('')
+    data.push('[Events]')
+    if (this.Events.Background) {
+      data.push(`0,0,"${this.Events.Background}",0,0`)
+    }
+    for (let b of this.Events.Breaks) {
+      data.push(`2,${b.start},${b.end}`)
+    }
+    data.push('')
+    data.push('[TimingPoints]')
+    for (let tp of this.TimingPoints) {
+      data.push(`${tp.time},${tp.beatLength},${tp.meter},${tp.sampleSet},${tp.sampleIndex},${tp.volume},${+tp.inherited},${+tp.inherited}`)
+    }
+    return data.filter(v => v !== null).join('\n')
   }
 
   /**
@@ -237,13 +286,13 @@ class Beatmap {
   static async fromJSON (jsonData) {
     let data = JSON.parse(jsonData)
     let beatmap = new Beatmap()
-    beatmap.version = data.version || beatmap.version
-    beatmap.general = {...beatmap.general, ...data.general}
-    beatmap.metadata = {...beatmap.metadata, ...data.metadata}
-    beatmap.editor = {...beatmap.editor, ...data.editor}
-    beatmap.colours = data.colours ? data.colours.map(c => new Colour(...c)) : []
-    beatmap.timingPoints = data.timingPoints || []
-    beatmap.events = {...beatmap.events, ...data.events}
+    beatmap.Version = data.Version || beatmap.Version
+    beatmap.General = {...beatmap.General, ...data.General}
+    beatmap.Metadata = {...beatmap.Metadata, ...data.Metadata}
+    beatmap.Editor = {...beatmap.Editor, ...data.Editor}
+    beatmap.Colours = data.Colours ? data.Colours.map(c => new Colour(...c)) : []
+    beatmap.TimingPoints = data.TimingPoints || []
+    beatmap.Events = {...beatmap.Events, ...data.Events}
     return beatmap
   }
 }

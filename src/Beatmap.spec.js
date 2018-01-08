@@ -3,6 +3,9 @@ const Request = require('request-promise-native')
 
 let testOsu
 let testJson
+/**
+ * @type {Beatmap} beatmap
+ */
 let beatmap
 
 before (async () => {
@@ -25,6 +28,13 @@ describe ('Beatmap', () => {
     it ('should return a new Beatmap instance', async () => {
       let testJsonBeatmap = await Beatmap.fromJSON(testJson)
       return testJsonBeatmap instanceof Beatmap
+    })
+  })
+  
+  describe ('#toOsu()', () => {
+    it ('should return an osu formatted file', () => {
+      let formatted = beatmap.toOsu()
+      return typeof formatted === 'string' && formatted.includes('osu file format v14')
     })
   })
 })
