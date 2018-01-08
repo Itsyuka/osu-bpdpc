@@ -1,6 +1,12 @@
+const Vector2 = require('./Utils/Vector2')
 const Colour = require('./Colour')
-const Crunch = require('./utils/OsuCruncher')
+const Crunch = require('./Utils/OsuCruncher')
+const HitType = require('./Enum/HitType')
 
+/**
+ * Creates a new Beatmap
+ * @class
+ */
 class Beatmap {
   constructor () {
     this.Version = 0
@@ -60,7 +66,7 @@ class Beatmap {
 
   /**
    * Parses an .osu file and returns a new Beatmap instance
-   * @param {string|Buffer} body
+   * @param {String | Buffer} body
    * @returns {Promise<Beatmap>}
    */
   static async fromOsu (body) {
@@ -68,7 +74,6 @@ class Beatmap {
     if (body instanceof Buffer) body = body.toString()
     let beatmap = new Beatmap()
     let section = null
-    let hitObjectsLines = []
     let lines = body.split('\n').map(v => v.trim()) // Cache this for better performance of the loop
     for (let line of lines) {
       if (line.startsWith('//')) continue // Ignore comments
@@ -196,9 +201,69 @@ class Beatmap {
           }
           break
         }
-        case 'HitObjects':
-          hitObjectsLines.push(line)
+        case 'HitObjects': { // TODO: Optimize this
+          let [x, y, startTime, hitType, hitSound, ...args] = line.split(',')
+          let hitObject = {
+            pos: new Vector2(parseInt(x, 10), parseInt(y, 10)),
+            startTime: parseInt(startTime, 10),
+            hitType: parseInt(hitType, 10),
+            hitSound: parseInt(hitSound)
+          }
+          if (args[args.length - 1].includes(':')) { // some sliders don't use the extras
+            if (hitType & HitType.Hold) {
+              let [endTime, sampleSet, additionSet, customIndex, sampleVolume, filename] = args.pop().split(':')
+              hitObject = {
+                ...hitObject,
+                endTime: parseInt(endTime, 10),
+                extras: {
+                  sampleSet: parseInt(sampleSet, 10),
+                  additionSet: parseInt(additionSet, 10),
+                  customIndex: parseInt(customIndex, 10),
+                  sampleVolume: parseInt(sampleVolume, 10),
+                  filename
+                }
+              }
+            } else {
+              let [sampleSet, additionSet, customIndex, sampleVolume, filename] = args.pop().split(':')
+              hitObject = {
+                ...hitObject,
+                extras: {
+                  sampleSet: parseInt(sampleSet, 10),
+                  additionSet: parseInt(additionSet, 10),
+                  customIndex: parseInt(customIndex, 10),
+                  sampleVolume: parseInt(sampleVolume, 10),
+                  filename
+                }
+              }
+            }
+          }
+          if (hitType & HitType.Slider) {
+            let [curvyBits, repeat, pixelLength, edgeHitSounds, edgeAdditions] = args
+            let [type, ...curves] = curvyBits.split('|')
+            let curvePoints = curves.map(v => v.split(':').map(v => parseInt(v, 10))).map(v => new Vector2(v[0], v[1]))
+            hitObject = {
+              ...hitObject,
+              curveType: type,
+              curvePoints,
+              repeat: parseInt(repeat, 10),
+              pixelLength: parseInt(pixelLength, 10)
+            }
+            if (edgeHitSounds) {
+              hitObject.edgeHitSounds = edgeHitSounds.split('|').map(v => parseInt(v, 10))
+            }
+            if (edgeAdditions) {
+              hitObject.edgeAdditions = edgeAdditions.split('|').map(v => v.split(':')).map(v => ({sampleSet: parseInt(v[0], 10), additionSet: parseInt(v[1], 10)}))
+            }
+          }
+          if (hitType & HitType.Spinner) {
+            hitObject = {
+              ...hitObject,
+              endTime: parseInt(args[0], 10)
+            }
+          }
+          beatmap.HitObjects.push(hitObject)
           break
+        }
         case 'TimingPoints': {
           let args = line.split(',')
           beatmap.TimingPoints.push({
@@ -232,6 +297,7 @@ class Beatmap {
 
   /**
    * Outputs as an .osu file format
+   * TODO: Optimize this
    * @returns {String}
    */
   toOsu () {
@@ -280,7 +346,7 @@ class Beatmap {
 
   /**
    * Parses a JSON string and returns a new Beatmap Instance
-   * @param {string} jsonData
+   * @param {String} jsonData
    * @returns {Promise<Beatmap>}
    */
   static async fromJSON (jsonData) {
