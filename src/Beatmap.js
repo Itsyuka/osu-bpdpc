@@ -66,6 +66,7 @@ class Beatmap {
 
   /**
    * Parses an .osu file and returns a new Beatmap instance
+   * TODO: Possibly replace the for-loop to a promise map
    * @param {String | Buffer} body
    * @returns {Promise<Beatmap>}
    */
@@ -201,7 +202,7 @@ class Beatmap {
           }
           break
         }
-        case 'HitObjects': { // TODO: Optimize this
+        case 'HitObjects': { // TODO: Optimize and clean
           let [x, y, startTime, hitType, hitSound, ...args] = line.split(',')
           let hitObject = {
             pos: new Vector2(parseInt(x, 10), parseInt(y, 10)),
@@ -297,7 +298,7 @@ class Beatmap {
 
   /**
    * Outputs as an .osu file format
-   * TODO: Optimize this
+   * TODO: Optimize and implement HitObjects
    * @returns {String}
    */
   toOsu () {
@@ -346,6 +347,7 @@ class Beatmap {
 
   /**
    * Parses a JSON string and returns a new Beatmap Instance
+   * TODO: Implement HitObjects
    * @param {String} jsonData
    * @returns {Promise<Beatmap>}
    */
