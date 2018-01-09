@@ -283,7 +283,7 @@ class Beatmap {
           let [, value] = line.split(':').map(v => v.trim())
           beatmap.Colours.push(new Colour(...value.split(',')))
           break
-        case 'Events':
+        case 'Events': // TODO: Work on true storyboard support
           let [type, ...params] = line.split(',')
           if (type === '0') {
             beatmap.Events.Background = params[1].replace(/"/g, '')
@@ -341,6 +341,26 @@ class Beatmap {
     data.push('[TimingPoints]')
     for (let tp of this.TimingPoints) {
       data.push(`${tp.time},${tp.beatLength},${tp.meter},${tp.sampleSet},${tp.sampleIndex},${tp.volume},${+tp.inherited},${+tp.inherited}`)
+    }
+    data.push('')
+    data.push('[HitObjects]')
+    for (let ho of this.HitObjects) {
+      let stringBuilder = ''
+      stringBuilder += `${ho.pos.x},${ho.pos.y},${ho.startTime},${ho.hitType},${ho.hitSound},`
+      if (ho.hitType & HitType.Slider) {
+        stringBuilder += `${ho.curveType}|`
+        stringBuilder += ho.curvePoints.map(v => `${v.x}:${v.y}`).join('|')
+        stringBuilder += `,${ho.repeat},${ho.pixelLength},`
+        if (ho.edgeHitSounds) {
+          stringBuilder += ho.edgeHitSounds.join('|') + ','
+          stringBuilder += ho.edgeAdditions.map(v => `${v.sampleSet}:${v.additionSet}`).join('|') + ','
+        }
+      }
+
+      if (ho.extras) {
+        stringBuilder += `${ho.extras.sampleSet}:${ho.extras.additionSet}:${ho.extras.customIndex}:${ho.extras.sampleVolume}:${ho.extras.filename}`
+      }
+      data.push(stringBuilder)
     }
     return data.filter(v => v !== null).join('\n')
   }
