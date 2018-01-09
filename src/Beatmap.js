@@ -3,10 +3,6 @@ const Colour = require('./Colour')
 const Crunch = require('./Utils/OsuCruncher')
 const HitType = require('./Enum/HitType')
 
-/**
- * Creates a new Beatmap
- * @class
- */
 class Beatmap {
   constructor () {
     this.Version = 0
@@ -64,18 +60,12 @@ class Beatmap {
     this.TimingPoints = []
   }
 
-  /**
-   * Parses an .osu file and returns a new Beatmap instance
-   * TODO: Possibly replace the for-loop to a promise map
-   * @param {String | Buffer} body
-   * @returns {Promise<Beatmap>}
-   */
-  static async fromOsu (body) {
-    if (!body) throw new Error('No beatmap found')
-    if (body instanceof Buffer) body = body.toString()
+  static async fromOsu (data) {
+    if (!data) throw new Error('No beatmap found')
+    if (data instanceof Buffer) data = data.toString()
     let beatmap = new Beatmap()
     let section = null
-    let lines = body.split('\n').map(v => v.trim()) // Cache this for better performance of the loop
+    let lines = data.split('\n').map(v => v.trim()) // Cache this for better performance of the loop
     for (let line of lines) {
       if (line.startsWith('//')) continue // Ignore comments
       if (!line) continue // Empty lines can pewf
@@ -87,7 +77,7 @@ class Beatmap {
         section = /^\s*\[(.+?)\]\s*$/.exec(line)[1]
         continue
       }
-      switch (section) {
+      switch (section) { // TODO: Remove this and append lines to an array for each category and parse them later as a promise
         case 'General': {
           let [key, value] = line.split(':').map(v => v.trim())
           switch (key) {
@@ -296,12 +286,7 @@ class Beatmap {
     return beatmap
   }
 
-  /**
-   * Outputs as an .osu file format
-   * TODO: Optimize and implement HitObjects
-   * @returns {String}
-   */
-  toOsu () {
+  toOsu () { // TODO: Optimize this 3ms takes too long!
     let data = []
     data.push(`osu file format v${this.Version}`)
     data.push('')
@@ -365,22 +350,20 @@ class Beatmap {
     return data.filter(v => v !== null).join('\n')
   }
 
-  /**
-   * Parses a JSON string and returns a new Beatmap Instance
-   * TODO: Implement HitObjects
-   * @param {String} jsonData
-   * @returns {Promise<Beatmap>}
-   */
-  static async fromJSON (jsonData) {
-    let data = JSON.parse(jsonData)
+  static async fromJSON (data) {
+    let d = JSON.parse(data)
     let beatmap = new Beatmap()
-    beatmap.Version = data.Version || beatmap.Version
-    beatmap.General = {...beatmap.General, ...data.General}
-    beatmap.Metadata = {...beatmap.Metadata, ...data.Metadata}
-    beatmap.Editor = {...beatmap.Editor, ...data.Editor}
-    beatmap.Colours = data.Colours ? data.Colours.map(c => new Colour(...c)) : []
-    beatmap.TimingPoints = data.TimingPoints || []
-    beatmap.Events = {...beatmap.Events, ...data.Events}
+    beatmap.Version = d.Version || beatmap.Version
+    beatmap.General = {...beatmap.General, ...d.General}
+    beatmap.Metadata = {...beatmap.Metadata, ...d.Metadata}
+    beatmap.Editor = {...beatmap.Editor, ...d.Editor}
+    beatmap.Colours = d.Colours ? d.Colours.map(c => new Colour(...c)) : []
+    beatmap.TimingPoints = d.TimingPoints || []
+    beatmap.Events = {...beatmap.Events, ...d.Events}
+    beatmap.HitObjects = d.HitObjects.map(v => {
+      v.pos = new Vector2(v.pos.x, v.pos.y)
+      return v
+    })
     return beatmap
   }
 }
