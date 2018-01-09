@@ -330,22 +330,18 @@ class Beatmap {
     data.push('')
     data.push('[HitObjects]')
     for (let ho of this.HitObjects) {
-      let stringBuilder = ''
-      stringBuilder += `${ho.pos.x},${ho.pos.y},${ho.startTime},${ho.hitType},${ho.hitSound},`
+      let arrayBuilder = []
+      arrayBuilder.push(ho.pos.x, ho.pos.y, ho.startTime, ho.hitType, ho.hitSound)
       if (ho.hitType & HitType.Slider) {
-        stringBuilder += `${ho.curveType}|`
-        stringBuilder += ho.curvePoints.map(v => `${v.x}:${v.y}`).join('|')
-        stringBuilder += `,${ho.repeat},${ho.pixelLength},`
+        arrayBuilder.push(`${ho.curveType}|${ho.curvePoints.map(v => `${v.x}:${v.y}`).join('|')}`, ho.repeat, ho.pixelLength)
         if (ho.edgeHitSounds) {
-          stringBuilder += ho.edgeHitSounds.join('|') + ','
-          stringBuilder += ho.edgeAdditions.map(v => `${v.sampleSet}:${v.additionSet}`).join('|') + ','
+          arrayBuilder.push(ho.edgeHitSounds.join('|'), ho.edgeAdditions.map(v => `${v.sampleSet}:${v.additionSet}`).join('|'))
         }
       }
-
       if (ho.extras) {
-        stringBuilder += `${ho.extras.sampleSet}:${ho.extras.additionSet}:${ho.extras.customIndex}:${ho.extras.sampleVolume}:${ho.extras.filename}`
+        arrayBuilder.push(`${ho.extras.sampleSet}:${ho.extras.additionSet}:${ho.extras.customIndex}:${ho.extras.sampleVolume}:${ho.extras.filename}`)
       }
-      data.push(stringBuilder)
+      data.push(arrayBuilder.join(','))
     }
     return data.filter(v => v !== null).join('\n')
   }
