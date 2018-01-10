@@ -1,8 +1,8 @@
 {
   "name": "osu-bpdpc",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Osu beatmap parser, difficulty and performance calculator",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha src/**/*.spec.js"
   },
