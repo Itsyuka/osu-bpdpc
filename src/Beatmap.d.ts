@@ -1,54 +1,57 @@
 import Vector2 from './Utils/Vector2';
+import HitType from './Enum/HitType';
+import HitSound from './Enum/HitSound';
+import Colour from './Colour';
 export = Beatmap;
 
 declare class Beatmap {
   General: {
-    AudioFilename: String,
-    AudioLeadin: Number,
-    PreviewTime: Number,
-    Countdown: Boolean,
-    SampleSet: String,
-    StackLeniency: Number,
-    Mode: Number,
-    LetterboxInBreaks: Boolean,
-    WidescreenStoryboard: Boolean
+    AudioFilename: string,
+    AudioLeadin: number,
+    PreviewTime: number,
+    Countdown: boolean,
+    SampleSet: string,
+    StackLeniency: number,
+    Mode: number,
+    LetterboxInBreaks: boolean,
+    WidescreenStoryboard: boolean
   };
 
   Difficulty: {
-    HPDrainRate: Number,
-    CircleSize: Number,
-    OverallDifficulty: Number,
-    ApproachRate: Number,
-    SliderMultiplier: Number,
-    SliderTickRate: Number
+    HPDrainRate: number,
+    CircleSize: number,
+    OverallDifficulty: number,
+    ApproachRate: number,
+    SliderMultiplier: number,
+    SliderTickRate: number
   };
 
   Editor: {
-    Bookmarks: Number[],
-    DistanceSpacing: Number,
-    BeatDivisor: Number,
-    GridSize: Number,
-    TimelineZoom: Number
+    Bookmarks: number[],
+    DistanceSpacing: number,
+    BeatDivisor: number,
+    GridSize: number,
+    TimelineZoom: number
   };
 
   Metadata: {
-    Title: String,
-    TitleUnicode: String,
-    Artist: String,
-    ArtistUnicode: String,
-    Creator: String,
-    Version: String,
-    Source: String,
-    Tags: String[],
-    BeatmapID: Number,
-    BeatmapSetID: Number
+    Title: string,
+    TitleUnicode: string,
+    Artist: string,
+    ArtistUnicode: string,
+    Creator: string,
+    Version: string,
+    Source: string,
+    Tags: string[],
+    BeatmapID: number,
+    BeatmapSetID: number
   };
 
 
   Colours: Colour[];
 
   Events: {
-    Background: String,
+    Background: string,
     Breaks: Break[]
   };
 
@@ -57,44 +60,44 @@ declare class Beatmap {
   /**
    * Takes a buffer/string of a .osu file and returns a new Beatmap instance
    */
-  static async fromOsu(data: (Buffer|String)): Promise<Beatmap>;
+  static async fromOsu(data: (Buffer|string)): Promise<Beatmap>;
 
   /**
    * Takes a JSON string and returns a new Beatmap instance
    */
-  static async fromJSON(data: String): Promise<Beatmap>;
+  static async fromJSON(data: string): Promise<Beatmap>;
 
   /**
    * Returns a string for an .osu file
    */
-  toOsu(): String;
+  toOsu(): string;
 }
 
 declare interface Break {
-  start: Number,
-  end: Number
+  start: number,
+  end: number
 }
 
 declare interface HitObject {
   pos: Position,
-  startTime: Number,
-  endTime?: Number,
+  startTime: number,
+  endTime?: number,
   hitType: HitType,
   hitSound: HitSound,
   curveType?: CurveType,
   curvePoints?: Vector2[],
-  repeat?: Number,
-  pixelLength?: Number,
-  edgeHitSounds?: Number[],
+  repeat?: number,
+  pixelLength?: number,
+  edgeHitSounds?: number[],
   edgeAdditions?: {
-    sampleSet: Number,
-    additionSet: Number
+    sampleSet: number,
+    additionSet: number
   },
   extras?: {
-    sampleSet: Number,
-    additionSet: Number,
-    customIndex: Number,
-    sampleVolume: Number,
-    filename: String
+    sampleSet: number,
+    additionSet: number,
+    customIndex: number,
+    sampleVolume: number,
+    filename: string
   }
 }

@@ -1,19 +1,10 @@
 class Colour {
-  /**
-   * @param {Number|String} r
-   * @param {Number|String} g
-   * @param {Number|String} b
-   */
   constructor (r, g, b) {
-    this.r = parseInt(r, 10)
-    this.g = parseInt(g, 10)
-    this.b = parseInt(b, 10)
+    this.r = r
+    this.g = g
+    this.b = b
   }
 
-  /**
-   * Returns object to a hex or osu styled string
-   * @param {String?} type
-   */
   toString (type = 'osu') {
     if (type === 'osu') {
       return `${this.r},${this.g},${this.b}`

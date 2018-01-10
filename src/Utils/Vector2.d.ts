@@ -1,10 +1,10 @@
 export = Vector2;
 
 declare class Vector2 {
-  x: Number;
-  y: Number;
+  x: number;
+  y: number;
 
-  constructor(x: Number, y: Number);
+  constructor(x: number, y: number);
 
   /**
    * Adds a vector to current and returns a new instance
@@ -19,17 +19,17 @@ declare class Vector2 {
   /**
    * Scales the vector and returns a new instance
    */
-  scale(multiplier: Number): Vector2;
+  scale(multiplier: number): Vector2;
 
   /**
    * Returns the length of the 2 points in the vector
    */
-  length(): Number;
+  length(): number;
 
   /**
    * Returns the distance between 2 vectors
    */
-  distance(vec: Vector2): Number;
+  distance(vec: Vector2): number;
 
   /**
    * Clones the current vector and returns it

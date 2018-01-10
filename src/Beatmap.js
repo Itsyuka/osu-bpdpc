@@ -271,7 +271,7 @@ class Beatmap {
         }
         case 'Colours':
           let [, value] = line.split(':').map(v => v.trim())
-          beatmap.Colours.push(new Colour(...value.split(',')))
+          beatmap.Colours.push(new Colour(...value.split(',').map(v => parseInt(v, 10))))
           break
         case 'Events': // TODO: Work on true storyboard support
           let [type, ...params] = line.split(',')
@@ -358,6 +358,9 @@ class Beatmap {
     beatmap.Events = {...beatmap.Events, ...d.Events}
     beatmap.HitObjects = d.HitObjects.map(v => {
       v.pos = new Vector2(v.pos.x, v.pos.y)
+      if (v.curvePoints) {
+        v.curvePoints = v.curvePoints.map(cp => new Vector2(cp.x, cp.y))
+      }
       return v
     })
     return beatmap
