@@ -15,7 +15,7 @@ before (async () => {
 describe ('Beatmap', () => {
   describe ('#fromOsu()', () => {
     it ('should return a new Beatmap instance', async () => {
-      beatmap = await Beatmap.fromOsu(testMapFile)
+      beatmap = Beatmap.fromOsu(testMapFile)
       return beatmap instanceof Beatmap
     })
 
@@ -26,7 +26,7 @@ describe ('Beatmap', () => {
 
   describe ('#fromJSON()', () => {
     it ('should return a new Beatmap instance', async () => {
-      let testJsonBeatmap = await Beatmap.fromJSON(testJson)
+      let testJsonBeatmap = Beatmap.fromJSON(testJson)
       return testJsonBeatmap instanceof Beatmap
     })
   })

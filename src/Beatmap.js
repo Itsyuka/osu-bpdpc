@@ -61,7 +61,7 @@ class Beatmap {
     this.TimingPoints = []
   }
 
-  static async fromOsu (data) {
+  static fromOsu (data) {
     if (!data) throw new Error('No beatmap found')
     if (data instanceof Buffer) data = data.toString()
     let beatmap = new Beatmap()
@@ -367,7 +367,7 @@ class Beatmap {
     return data.filter(v => v !== null).join('\n')
   }
 
-  static async fromJSON (data) { // TODO: redo HitObjects parsing from JSON
+  static fromJSON (data) { // TODO: redo HitObjects parsing from JSON
     let d = JSON.parse(data)
     let beatmap = new Beatmap()
     beatmap.Version = d.Version || beatmap.Version
