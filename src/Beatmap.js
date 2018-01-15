@@ -291,13 +291,13 @@ class Beatmap {
           break
       }
     }
-    let parentPoint = this.TimingPoints.find(tp => !tp.inherited)
+    let parentPoint = beatmap.TimingPoints.find(tp => !tp.inherited)
 
-    for (const tp of this.TimingPoints) {
+    for (const tp of beatmap.TimingPoints) {
       if (!tp.inherited) parentPoint = tp
 
-      for (let hitObject of this.HitObjects.filter(ho => ho.startTime >= tp.time)) {
-        if (hitObject.finalize) hitObject.finalize(tp, parentPoint, this)
+      for (let hitObject of beatmap.HitObjects.filter(ho => ho.startTime >= tp.time)) {
+        if (hitObject.finalize) hitObject.finalize(tp, parentPoint, beatmap)
       }
     }
     return beatmap
