@@ -367,7 +367,7 @@ class Beatmap {
     return data.filter(v => v !== null).join('\n')
   }
 
-  static fromJSON (data) { // TODO: redo HitObjects parsing from JSON
+  static fromJSON (data) {
     let d = JSON.parse(data)
     let beatmap = new Beatmap()
     beatmap.Version = d.Version || beatmap.Version
@@ -377,14 +377,41 @@ class Beatmap {
     beatmap.Colours = d.Colours ? d.Colours.map(c => new Colour(...c)) : []
     beatmap.TimingPoints = d.TimingPoints || []
     beatmap.Events = {...beatmap.Events, ...d.Events}
-    beatmap.HitObjects = d.HitObjects.map(v => {
-      v.pos = new Vector2(v.pos.x, v.pos.y)
-      if (v.curvePoints) {
-        v.curvePoints = v.curvePoints.map(cp => new Vector2(cp.x, cp.y))
+    beatmap.HitObjects = d.HitObjects.map(hitObject => {
+      hitObject.pos = new Vector2(hitObject.pos.x, hitObject.pos.y)
+      if (hitObject.curvePoints) {
+        hitObject.curvePoints = hitObject.curvePoints.map(curvePoint => new Vector2(curvePoint.x, curvePoint.y))
       }
-      return v
+      switch (beatmap.General.Mode) {
+        case 0: {
+          if (hitObject.hitType & HitType.Normal) hitObject = OsuHitObjectFactory.Circle(hitObject)
+          else if (hitObject.hitType & HitType.Slider) hitObject = OsuHitObjectFactory.Slider(hitObject)
+          else if (hitObject.hitType & HitType.Spinner) hitObject = OsuHitObjectFactory.Spinner(hitObject)
+        }
+      }
+      return hitObject
     })
     return beatmap
+  }
+
+  get countNormal () {
+    return this.HitObjects.filter(ho => ho.hitType & HitType.Normal).length
+  }
+
+  get countSlider () {
+    return this.HitObjects.filter(ho => ho.hitType & HitType.Slider).length
+  }
+
+  get countSpinner () {
+    return this.HitObjects.filter(ho => ho.hitType & HitType.Spinner).length
+  }
+
+  get countObjects () {
+    return this.HitObjects.length
+  }
+
+  get maxCombo () {
+    return this.HitObjects.reduce((a, c) => a + c.combo, 0)
   }
 }
 
