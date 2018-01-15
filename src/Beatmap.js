@@ -2,6 +2,7 @@ const Vector2 = require('./Utils/Vector2')
 const Colour = require('./Colour')
 const Crunch = require('./Utils/OsuCruncher')
 const HitType = require('./Enum/HitType')
+const OsuHitObjectFactory = require('./Rulesets/Osu/HitObjectFactory')
 
 class Beatmap {
   constructor () {
@@ -252,6 +253,13 @@ class Beatmap {
               endTime: parseInt(args[0], 10)
             }
           }
+          switch (beatmap.General.Mode) {
+            case 0: {
+              if (hitObject.hitType & HitType.Normal) hitObject = OsuHitObjectFactory.Circle(hitObject)
+              else if (hitObject.hitType & HitType.Slider) hitObject = OsuHitObjectFactory.Slider(hitObject)
+              else if (hitObject.hitType & HitType.Spinner) hitObject = OsuHitObjectFactory.Spinner(hitObject)
+            }
+          }
           beatmap.HitObjects.push(hitObject)
           break
         }
@@ -281,6 +289,15 @@ class Beatmap {
             beatmap.Events.Breaks.push({start: parseInt(params[0], 10), end: parseInt(params[1], 10)})
           }
           break
+      }
+    }
+    let parentPoint = this.TimingPoints.find(tp => !tp.inherited)
+
+    for (const tp of this.TimingPoints) {
+      if (!tp.inherited) parentPoint = tp
+
+      for (let hitObject of this.HitObjects.filter(ho => ho.startTime >= tp.time)) {
+        if (hitObject.finalize) hitObject.finalize(tp, parentPoint, this)
       }
     }
     return beatmap
@@ -330,23 +347,27 @@ class Beatmap {
     data.push('')
     data.push('[HitObjects]')
     for (let ho of this.HitObjects) {
-      let arrayBuilder = []
-      arrayBuilder.push(ho.pos.x, ho.pos.y, ho.startTime, ho.hitType, ho.hitSound)
-      if (ho.hitType & HitType.Slider) {
-        arrayBuilder.push(`${ho.curveType}|${ho.curvePoints.map(v => `${v.x}:${v.y}`).join('|')}`, ho.repeat, ho.pixelLength)
-        if (ho.edgeHitSounds) {
-          arrayBuilder.push(ho.edgeHitSounds.join('|'), ho.edgeAdditions.map(v => `${v.sampleSet}:${v.additionSet}`).join('|'))
+      if (ho.toOsu) {
+        data.push(ho.toOsu())
+      } else {
+        let arrayBuilder = []
+        arrayBuilder.push(ho.pos.x, ho.pos.y, ho.startTime, ho.hitType, ho.hitSound)
+        if (ho.hitType & HitType.Slider) {
+          arrayBuilder.push(`${ho.curveType}|${ho.curvePoints.map(v => `${v.x}:${v.y}`).join('|')}`, ho.repeat, ho.pixelLength)
+          if (ho.edgeHitSounds) {
+            arrayBuilder.push(ho.edgeHitSounds.join('|'), ho.edgeAdditions.map(v => `${v.sampleSet}:${v.additionSet}`).join('|'))
+          }
         }
+        if (ho.extras) {
+          arrayBuilder.push(`${ho.extras.sampleSet}:${ho.extras.additionSet}:${ho.extras.customIndex}:${ho.extras.sampleVolume}:${ho.extras.filename}`)
+        }
+        data.push(arrayBuilder.join(','))
       }
-      if (ho.extras) {
-        arrayBuilder.push(`${ho.extras.sampleSet}:${ho.extras.additionSet}:${ho.extras.customIndex}:${ho.extras.sampleVolume}:${ho.extras.filename}`)
-      }
-      data.push(arrayBuilder.join(','))
     }
     return data.filter(v => v !== null).join('\n')
   }
 
-  static async fromJSON (data) {
+  static async fromJSON (data) { // TODO: redo HitObjects parsing from JSON
     let d = JSON.parse(data)
     let beatmap = new Beatmap()
     beatmap.Version = d.Version || beatmap.Version

@@ -1,7 +1,7 @@
-import Vector2 from './Utils/Vector2';
-import HitType from './Enum/HitType';
-import HitSound from './Enum/HitSound';
-import Colour from './Colour';
+import Vector2 = require('./Utils/Vector2');
+import HitType = require('./Enum/HitType');
+import HitSound = require('./Enum/HitSound');
+import Colour = require('./Colour');
 export = Beatmap;
 
 declare class Beatmap {
@@ -57,15 +57,17 @@ declare class Beatmap {
 
   HitObjects: HitObject[];
 
+  TimingPoints: TimingPoint[];
+
   /**
    * Takes a buffer/string of a .osu file and returns a new Beatmap instance
    */
-  static async fromOsu(data: (Buffer|string)): Promise<Beatmap>;
+  static fromOsu(data: (Buffer | string)): Promise<Beatmap>;
 
   /**
    * Takes a JSON string and returns a new Beatmap instance
    */
-  static async fromJSON(data: string): Promise<Beatmap>;
+  static fromJSON(data: string): Promise<Beatmap>;
 
   /**
    * Returns a string for an .osu file
@@ -79,12 +81,12 @@ declare interface Break {
 }
 
 declare interface HitObject {
-  pos: Position,
+  pos: Vector2,
   startTime: number,
   endTime?: number,
   hitType: HitType,
   hitSound: HitSound,
-  curveType?: CurveType,
+  curveType?: string,
   curvePoints?: Vector2[],
   repeat?: number,
   pixelLength?: number,
@@ -100,4 +102,15 @@ declare interface HitObject {
     sampleVolume: number,
     filename: string
   }
+}
+
+declare interface TimingPoint {
+  time: number,
+  beatLength: number,
+  meter: number,
+  sampleSet: number,
+  sampleIndex: number,
+  volume: number,
+  inherited: boolean,
+  kiai: boolean
 }
