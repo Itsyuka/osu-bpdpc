@@ -28,13 +28,18 @@ class PerformanceCalculator {
     let totalHits = score.count300 + score.count100 + score.count50 + score.countMiss
     let acc = this.accuracyCalc(score.count300, score.count100, score.count50, score.countMiss)
 
-    this.aimPerformance = Math.pow(5 * Math.max(1, this.aimDifficulty / 0.0675) - 4, 3) / 100000
+    let trueAimDifficulty = this.aimDifficulty
+
+    if (this.mods & Mods.Touch) trueAimDifficulty = Math.pow(trueAimDifficulty, 0.8) // This is to reduce PP from touchscreen plays
+
+    this.aimPerformance = Math.pow(5 * Math.max(1, trueAimDifficulty / 0.0675) - 4, 3) / 100000
+
     let totalHitsOver = totalHits / 2000
     let lengthBonus = 0.95 + 0.4 * Math.min(1, totalHitsOver) + (totalHits > 2000 ? Math.log(totalHitsOver) * 0.5 : 0)
 
     let missPenalty = Math.pow(0.97, score.countMiss)
 
-    let comboBreak = Math.pow(score.maxcombo, 0.8) / Math.pow(this.beatmap.maxCombo, 0.8)
+    let comboBreak = Math.min(Math.pow(score.maxcombo, 0.8) / Math.pow(this.beatmap.maxCombo, 0.8), 1)
 
     this.aimPerformance *= lengthBonus
     this.aimPerformance *= missPenalty
@@ -44,11 +49,11 @@ class PerformanceCalculator {
     if (this.approachRate > 10.33) {
       arBonus += 0.45 * (this.approachRate - 10.33)
     } else if (this.approachRate < 8) {
-      let lowArBonus = 0.01 * (8 - this.approachRate)
       if (this.mods & Mods.Hidden) {
-        lowArBonus *= 2
+        arBonus += 0.02 * (8 - this.approachRate)
+      } else {
+        arBonus += 0.01 * (8 - this.approachRate)
       }
-      arBonus += lowArBonus
     }
     this.aimPerformance *= arBonus
 
@@ -70,16 +75,26 @@ class PerformanceCalculator {
 
     let realAcc = 0
 
-    if (circles) {
-      realAcc = ((score.count300 - (totalHits - circles)) * 300 + score.count100 * 100 + score.count50 * 50) / (circles * 300)
+    if (this.mods & Mods.ScoreV2) {
+      circles = totalHits
+      realAcc = acc
+    } else {
+      if (circles) {
+        realAcc = ((score.count300 - (totalHits - circles)) * 6 + score.count100 * 2 + score.count50) / (circles * 6)
+      }
+      realAcc = Math.max(0, realAcc)
     }
-    realAcc = Math.max(0, realAcc)
 
     this.accuracyPerformance = Math.pow(1.52163, this.overallDifficulty) * Math.pow(realAcc, 24) * 2.83
     this.accuracyPerformance *= Math.min(1.15, Math.pow(circles / 1000, 0.3))
 
     if (this.mods & Mods.Hidden) this.accuracyPerformance *= 1.02
     if (this.mods & Mods.Flashlight) this.accuracyPerformance *= 1.02
+
+    if (this.mods & Mods.Relax || this.mods & Mods.Relax2 || this.mods & Mods.Autoplay) {
+      this.totalPerformance = 0
+      return this
+    }
 
     let finalMultiplier = 1.12
     if (this.mods & Mods.NoFail) finalMultiplier *= 0.9
