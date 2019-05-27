@@ -1,6 +1,4 @@
-export = Vector2;
-
-declare class Vector2 {
+export default class Vector2 {
   x: number;
   y: number;
 

@@ -1,10 +1,9 @@
-import Vector2 = require('./Utils/Vector2');
-import HitType = require('./Enum/HitType');
-import HitSound = require('./Enum/HitSound');
-import Colour = require('./Colour');
-export = Beatmap;
+import Vector2 from './Utils/Vector2'
+import HitType from './Enum/HitType'
+import HitSound from './Enum/HitSound'
+import Colour from './Colour'
 
-declare class Beatmap {
+export default class Beatmap {
   General: {
     AudioFilename: string,
     AudioLeadin: number,
@@ -75,12 +74,12 @@ declare class Beatmap {
   toOsu(): string;
 }
 
-declare interface Break {
+export interface Break {
   start: number,
   end: number
 }
 
-declare interface HitObject {
+export interface HitObject {
   pos: Vector2,
   startTime: number,
   endTime?: number,
@@ -104,7 +103,7 @@ declare interface HitObject {
   }
 }
 
-declare interface TimingPoint {
+export interface TimingPoint {
   time: number,
   beatLength: number,
   meter: number,

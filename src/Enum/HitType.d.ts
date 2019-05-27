@@ -1,5 +1,3 @@
-export = HitType;
-
 declare enum HitType {
   Normal = 1 << 0,
   Slider = 1 << 1,
@@ -10,3 +8,5 @@ declare enum HitType {
   ComboSkip3 = 1 << 6,
   Hold = 1 << 7
 }
+
+export default HitType

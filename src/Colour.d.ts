@@ -1,6 +1,4 @@
-export = Colour;
-
-declare class Colour {
+export default class Colour {
   constructor(r: number, g: number, b: number)
 
   /**
@@ -11,4 +9,4 @@ declare class Colour {
   toJSON(): number[]
 }
 
-declare type ColourType = 'osu' | 'hex';
+export type ColourType = 'osu' | 'hex'

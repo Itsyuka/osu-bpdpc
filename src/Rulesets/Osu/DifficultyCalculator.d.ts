@@ -1,5 +1,5 @@
-import Beatmap = require('../../Beatmap');
-import Mods = require('../../Enum/Mods');
+import Beatmap from '../../Beatmap'
+import Mods from '../../Enum/Mods'
 
 export = DifficultyCalculator;
 
@@ -13,8 +13,8 @@ declare class DifficultyCalculator {
 
   setMods(mods: Mods): this
 
-  get circleSize(): number
+  circleSize: number
 
-  get timeRate(): number
+  timeRate: number
 
 }
