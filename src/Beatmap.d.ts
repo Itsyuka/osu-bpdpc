@@ -62,7 +62,7 @@ declare class Beatmap {
   /**
    * Takes a buffer/string of a .osu file and returns a new Beatmap instance
    */
-  static fromOsu(data: (Buffer | string)): Promise<Beatmap>;
+  static fromOsu(data: (string)): Promise<Beatmap>;
 
   /**
    * Takes a JSON string and returns a new Beatmap instance

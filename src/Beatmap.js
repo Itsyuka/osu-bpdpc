@@ -63,7 +63,6 @@ class Beatmap {
 
   static fromOsu (data) {
     if (!data) throw new Error('No beatmap found')
-    if (data instanceof Buffer) data = data.toString()
     let beatmap = new Beatmap()
     let section = null
     let lines = data.split('\n').map(v => v.trim()) // Cache this for better performance of the loop

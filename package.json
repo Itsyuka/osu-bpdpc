@@ -4,7 +4,8 @@
   "description": "Osu beatmap parser, difficulty and performance calculator",
   "main": "index.js",
   "scripts": {
-    "test": "mocha src/**/*.spec.js"
+    "test": "mocha src/**/*.spec.js",
+    "lint": "eslint index.js src/ && tsc"
   },
   "keywords": [
     "osu!",
@@ -28,10 +29,6 @@
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
     "mocha": "^4.1.0",
-    "request": "^2.83.0",
-    "request-promise-native": "^1.0.5"
-  },
-  "dependencies": {
-    "@types/node": "^9.3.0"
+    "typescript": "^3.4.5"
   }
 }
