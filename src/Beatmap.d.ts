@@ -61,12 +61,12 @@ export default class Beatmap {
   /**
    * Takes a buffer/string of a .osu file and returns a new Beatmap instance
    */
-  static fromOsu(data: (string)): Promise<Beatmap>;
+  static fromOsu(data: (string)): Beatmap
 
   /**
    * Takes a JSON string and returns a new Beatmap instance
    */
-  static fromJSON(data: string): Promise<Beatmap>;
+  static fromJSON(data: string): Beatmap
 
   /**
    * Returns a string for an .osu file
