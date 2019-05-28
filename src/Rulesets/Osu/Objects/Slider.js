@@ -2,7 +2,7 @@ const HitObject = require('./HitObject')
 
 class Slider extends HitObject {
   constructor (hitObject) {
-    super({...hitObject, endTime: hitObject.endTime || hitObject.startTime})
+    super({ ...hitObject, endTime: hitObject.endTime || hitObject.startTime })
     this.curveType = hitObject.curveType
     this.curvePoints = hitObject.curvePoints
     this.repeat = hitObject.repeat

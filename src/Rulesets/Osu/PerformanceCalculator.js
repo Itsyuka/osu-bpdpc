@@ -1,7 +1,7 @@
 const Mods = require('../../Enum/Mods')
 
 class PerformanceCalculator {
-  constructor ({starDifficulty, aimDifficulty, speedDifficulty, mods, beatmap}) {
+  constructor ({ starDifficulty, aimDifficulty, speedDifficulty, mods, beatmap }) {
     this.starDifficulty = starDifficulty
     this.aimDifficulty = aimDifficulty
     this.speedDifficulty = speedDifficulty

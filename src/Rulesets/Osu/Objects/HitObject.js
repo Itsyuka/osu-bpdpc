@@ -1,7 +1,7 @@
 const HitType = require('../../../Enum/HitType')
 
 class HitObject {
-  constructor ({pos, startTime, endTime, hitType, hitSound, extras, combo = 1}) {
+  constructor ({ pos, startTime, endTime, hitType, hitSound, extras, combo = 1 }) {
     this.pos = pos
     this.startTime = startTime
     this.endTime = endTime

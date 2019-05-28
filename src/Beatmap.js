@@ -243,7 +243,7 @@ class Beatmap {
               hitObject.edgeHitSounds = edgeHitSounds.split('|').map(v => parseInt(v, 10))
             }
             if (edgeAdditions) {
-              hitObject.edgeAdditions = edgeAdditions.split('|').map(v => v.split(':')).map(v => ({sampleSet: parseInt(v[0], 10), additionSet: parseInt(v[1], 10)}))
+              hitObject.edgeAdditions = edgeAdditions.split('|').map(v => v.split(':')).map(v => ({ sampleSet: parseInt(v[0], 10), additionSet: parseInt(v[1], 10) }))
             }
           }
           if (hitType & HitType.Spinner) {
@@ -285,7 +285,7 @@ class Beatmap {
           if (type === '0') {
             beatmap.Events.Background = params[1].replace(/"/g, '')
           } else if (type === '2') {
-            beatmap.Events.Breaks.push({start: parseInt(params[0], 10), end: parseInt(params[1], 10)})
+            beatmap.Events.Breaks.push({ start: parseInt(params[0], 10), end: parseInt(params[1], 10) })
           }
           break
       }
@@ -370,12 +370,12 @@ class Beatmap {
     let d = JSON.parse(data)
     let beatmap = new Beatmap()
     beatmap.Version = d.Version || beatmap.Version
-    beatmap.General = {...beatmap.General, ...d.General}
-    beatmap.Metadata = {...beatmap.Metadata, ...d.Metadata}
-    beatmap.Editor = {...beatmap.Editor, ...d.Editor}
+    beatmap.General = { ...beatmap.General, ...d.General }
+    beatmap.Metadata = { ...beatmap.Metadata, ...d.Metadata }
+    beatmap.Editor = { ...beatmap.Editor, ...d.Editor }
     beatmap.Colours = d.Colours ? d.Colours.map(c => new Colour(...c)) : []
     beatmap.TimingPoints = d.TimingPoints || []
-    beatmap.Events = {...beatmap.Events, ...d.Events}
+    beatmap.Events = { ...beatmap.Events, ...d.Events }
     beatmap.HitObjects = d.HitObjects.map(hitObject => {
       hitObject.pos = new Vector2(hitObject.pos.x, hitObject.pos.y)
       if (hitObject.curvePoints) {
