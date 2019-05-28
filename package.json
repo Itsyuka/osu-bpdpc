@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha src/**/*.spec.js",
-    "lint": "eslint index.js src/ && tsc"
+    "lint": "eslint **/*.{js,ts} && tsc"
   },
   "keywords": [
     "osu!",
@@ -22,8 +22,11 @@
     "url": "https://github.com/Itsyuka/osu-bpdpc.git"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0-alpha.0",
+    "eslint-config-standard-with-typescript": "^7.0.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^9.1.0",
     "eslint-plugin-promise": "^4.1.1",
