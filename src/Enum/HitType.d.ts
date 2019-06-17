@@ -9,4 +9,4 @@ declare enum HitType {
   Hold = 1 << 7
 }
 
-export default HitType
+export default HitType;

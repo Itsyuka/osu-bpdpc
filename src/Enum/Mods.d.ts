@@ -33,4 +33,4 @@ declare enum Mods {
   LastMod = 1 << 30
 }
 
-export default Mods
+export default Mods;

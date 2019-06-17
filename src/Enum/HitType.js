@@ -7,4 +7,4 @@ module.exports = {
   ComboSkip2: 1 << 5,
   ComboSkip3: 1 << 6,
   Hold: 1 << 7
-}
+};

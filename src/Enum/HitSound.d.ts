@@ -5,4 +5,4 @@ declare enum HitSound {
   Clap = 1 << 3
 }
 
-export default HitSound
+export default HitSound;

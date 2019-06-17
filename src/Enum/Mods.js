@@ -31,4 +31,4 @@ module.exports = {
   Key2: 1 << 28,
   ScoreV2: 1 << 29,
   LastMod: 1 << 30
-}
+};

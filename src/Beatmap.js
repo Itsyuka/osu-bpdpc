@@ -1,24 +1,24 @@
-const Vector2 = require('./Utils/Vector2')
-const Colour = require('./Colour')
-const Crunch = require('./Utils/OsuCruncher')
-const HitType = require('./Enum/HitType')
-const OsuHitObjectFactory = require('./Rulesets/Osu/HitObjectFactory')
+const Vector2 = require("./Utils/Vector2");
+const Colour = require("./Colour");
+const Crunch = require("./Utils/OsuCruncher");
+const HitType = require("./Enum/HitType");
+const OsuHitObjectFactory = require("./Rulesets/Osu/HitObjectFactory");
 
 class Beatmap {
-  constructor () {
-    this.Version = 0
+  constructor() {
+    this.Version = 0;
 
     this.General = {
       AudioFilename: null,
       AudioLeadIn: 0,
       PreviewTime: 0,
       Countdown: false,
-      SampleSet: 'None', // None, Normal, Soft, etc
+      SampleSet: "None", // None, Normal, Soft, etc
       StackLeniency: 0,
       Mode: 0,
       LetterboxInBreaks: false,
       WidescreenStoryboard: false
-    }
+    };
 
     this.Difficulty = {
       HPDrainRate: 0,
@@ -27,7 +27,7 @@ class Beatmap {
       ApproachRate: 0,
       SliderMultiplier: 0,
       SliderTickRate: 0
-    }
+    };
 
     this.Editor = {
       Bookmarks: [],
@@ -35,7 +35,7 @@ class Beatmap {
       BeatDivisor: 0,
       GridSize: 0,
       TimelineZoom: 0
-    }
+    };
 
     this.Metadata = {
       Title: null,
@@ -48,161 +48,173 @@ class Beatmap {
       Tags: [],
       BeatmapID: 0,
       BeatmapSetID: 0
-    }
+    };
 
-    this.Colours = []
+    this.Colours = [];
 
     this.Events = {
       Background: null,
       Breaks: []
-    }
+    };
 
-    this.HitObjects = []
-    this.TimingPoints = []
+    this.HitObjects = [];
+    this.TimingPoints = [];
   }
 
-  static fromOsu (data) {
-    if (!data) throw new Error('No beatmap found')
-    let beatmap = new Beatmap()
-    let section = null
-    let lines = data.split('\n').map(v => v.trim()) // Cache this for better performance of the loop
+  static fromOsu(data) {
+    if (!data) throw new Error("No beatmap found");
+    let beatmap = new Beatmap();
+    let section = null;
+    let lines = data.split("\n").map(v => v.trim()); // Cache this for better performance of the loop
     for (let line of lines) {
-      if (line.startsWith('//')) continue // Ignore comments
-      if (!line) continue // Empty lines can pewf
-      if (!section && line.includes('osu file format v')) { // get the version of the beatmap
-        beatmap.Version = parseInt(line.split('osu file format v')[1], 10) // Parse only as an int
-        continue
+      if (line.startsWith("//")) continue; // Ignore comments
+      if (!line) continue; // Empty lines can pewf
+      if (!section && line.includes("osu file format v")) {
+        // get the version of the beatmap
+        beatmap.Version = parseInt(line.split("osu file format v")[1], 10); // Parse only as an int
+        continue;
       }
       if (/^\s*\[(.+?)\]\s*$/.test(line)) {
-        section = /^\s*\[(.+?)\]\s*$/.exec(line)[1]
-        continue
+        section = /^\s*\[(.+?)\]\s*$/.exec(line)[1];
+        continue;
       }
-      switch (section) { // TODO: Remove this and append lines to an array for each category and parse them later as a promise
-        case 'General': {
-          let [key, value] = line.split(':').map(v => v.trim())
+      switch (section) {
+        case "General": {
+          let [key, value] = line.split(":").map(v => v.trim());
           switch (key) {
-            case 'AudioFilename':
-              beatmap[section][key] = value
-              break
-            case 'AudioLeadIn':
-              beatmap[section][key] = parseInt(value, 10)
-              break
-            case 'PreviewTime':
-              beatmap[section][key] = parseInt(value, 10)
-              break
-            case 'Countdown':
-              beatmap[section][key] = value === '1'
-              break
-            case 'SampleSet':
-              beatmap[section][key] = value
-              break
-            case 'StackLeniency':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'Mode':
-              beatmap[section][key] = parseInt(value, 10)
-              break
-            case 'LetterboxInBreaks':
-              beatmap[section][key] = value === '1'
-              break
-            case 'WidescreenStoryboard':
-              beatmap[section][key] = value === '1'
-              break
+            case "AudioFilename":
+              beatmap[section][key] = value;
+              break;
+            case "AudioLeadIn":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
+            case "PreviewTime":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
+            case "Countdown":
+              beatmap[section][key] = value === "1";
+              break;
+            case "SampleSet":
+              beatmap[section][key] = value;
+              break;
+            case "StackLeniency":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "Mode":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
+            case "LetterboxInBreaks":
+              beatmap[section][key] = value === "1";
+              break;
+            case "WidescreenStoryboard":
+              beatmap[section][key] = value === "1";
+              break;
           }
-          break
+          break;
         }
-        case 'Editor': {
-          let [key, value] = line.split(':').map(v => v.trim())
+        case "Editor": {
+          let [key, value] = line.split(":").map(v => v.trim());
           switch (key) {
-            case 'Bookmarks':
-              beatmap[section][key] = value.split(',').map(v => parseInt(v, 10))
-              break
-            case 'DistanceSpacing':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'BeatDivisor':
-              beatmap[section][key] = parseInt(value, 10)
-              break
-            case 'GridSize':
-              beatmap[section][key] = parseInt(value, 10)
-              break
-            case 'TimelineZoom':
-              beatmap[section][key] = parseInt(value, 10)
-              break
+            case "Bookmarks":
+              beatmap[section][key] = value
+                .split(",")
+                .map(v => parseInt(v, 10));
+              break;
+            case "DistanceSpacing":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "BeatDivisor":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
+            case "GridSize":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
+            case "TimelineZoom":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
           }
-          break
+          break;
         }
-        case 'Metadata': {
-          let [key, value] = line.split(':').map(v => v.trim())
+        case "Metadata": {
+          let [key, value] = line.split(":").map(v => v.trim());
           switch (key) {
-            case 'Title':
-              beatmap[section][key] = value
-              break
-            case 'TitleUnicode':
-              beatmap[section][key] = value
-              break
-            case 'Artist':
-              beatmap[section][key] = value
-              break
-            case 'ArtistUnicode':
-              beatmap[section][key] = value
-              break
-            case 'Creator':
-              beatmap[section][key] = value
-              break
-            case 'Version':
-              beatmap[section][key] = value
-              break
-            case 'Source':
-              beatmap[section][key] = value
-              break
-            case 'Tags':
-              beatmap[section][key] = value.split(' ')
-              break
-            case 'BeatmapID':
-              beatmap[section][key] = parseInt(value, 10)
-              break
-            case 'BeatmapSetID':
-              beatmap[section][key] = parseInt(value, 10)
-              break
+            case "Title":
+              beatmap[section][key] = value;
+              break;
+            case "TitleUnicode":
+              beatmap[section][key] = value;
+              break;
+            case "Artist":
+              beatmap[section][key] = value;
+              break;
+            case "ArtistUnicode":
+              beatmap[section][key] = value;
+              break;
+            case "Creator":
+              beatmap[section][key] = value;
+              break;
+            case "Version":
+              beatmap[section][key] = value;
+              break;
+            case "Source":
+              beatmap[section][key] = value;
+              break;
+            case "Tags":
+              beatmap[section][key] = value.split(" ");
+              break;
+            case "BeatmapID":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
+            case "BeatmapSetID":
+              beatmap[section][key] = parseInt(value, 10);
+              break;
           }
-          break
+          break;
         }
-        case 'Difficulty': {
-          let [key, value] = line.split(':').map(v => v.trim())
+        case "Difficulty": {
+          let [key, value] = line.split(":").map(v => v.trim());
           switch (key) {
-            case 'HPDrainRate':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'CircleSize':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'OverallDifficulty':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'ApproachRate':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'SliderMultiplier':
-              beatmap[section][key] = parseFloat(value)
-              break
-            case 'SliderTickRate':
-              beatmap[section][key] = parseFloat(value)
-              break
+            case "HPDrainRate":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "CircleSize":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "OverallDifficulty":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "ApproachRate":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "SliderMultiplier":
+              beatmap[section][key] = parseFloat(value);
+              break;
+            case "SliderTickRate":
+              beatmap[section][key] = parseFloat(value);
+              break;
           }
-          break
+          break;
         }
-        case 'HitObjects': { // TODO: Optimize and clean
-          let [x, y, startTime, hitType, hitSound, ...args] = line.split(',')
+        case "HitObjects": {
+          // TODO: Optimize and clean
+          let [x, y, startTime, hitType, hitSound, ...args] = line.split(",");
           let hitObject = {
             pos: new Vector2(parseInt(x, 10), parseInt(y, 10)),
             startTime: parseInt(startTime, 10),
             hitType: parseInt(hitType, 10),
             hitSound: parseInt(hitSound)
-          }
-          if (args[args.length - 1].includes(':')) { // some sliders don't use the extras
+          };
+          if (args[args.length - 1].includes(":")) {
+            // some sliders don't use the extras
             if (hitType & HitType.Hold) {
-              let [endTime, sampleSet, additionSet, customIndex, sampleVolume, filename] = args.pop().split(':')
+              let [
+                endTime,
+                sampleSet,
+                additionSet,
+                customIndex,
+                sampleVolume,
+                filename
+              ] = args.pop().split(":");
               hitObject = {
                 ...hitObject,
                 endTime: parseInt(endTime, 10),
@@ -213,9 +225,15 @@ class Beatmap {
                   sampleVolume: parseInt(sampleVolume, 10),
                   filename
                 }
-              }
+              };
             } else {
-              let [sampleSet, additionSet, customIndex, sampleVolume, filename] = args.pop().split(':')
+              let [
+                sampleSet,
+                additionSet,
+                customIndex,
+                sampleVolume,
+                filename
+              ] = args.pop().split(":");
               hitObject = {
                 ...hitObject,
                 extras: {
@@ -225,45 +243,64 @@ class Beatmap {
                   sampleVolume: parseInt(sampleVolume, 10),
                   filename
                 }
-              }
+              };
             }
           }
           if (hitType & HitType.Slider) {
-            let [curvyBits, repeat, pixelLength, edgeHitSounds, edgeAdditions] = args
-            let [type, ...curves] = curvyBits.split('|')
-            let curvePoints = curves.map(v => v.split(':').map(v => parseInt(v, 10))).map(v => new Vector2(v[0], v[1]))
+            let [
+              curvyBits,
+              repeat,
+              pixelLength,
+              edgeHitSounds,
+              edgeAdditions
+            ] = args;
+            let [type, ...curves] = curvyBits.split("|");
+            let curvePoints = curves
+              .map(v => v.split(":").map(v => parseInt(v, 10)))
+              .map(v => new Vector2(v[0], v[1]));
             hitObject = {
               ...hitObject,
               curveType: type,
               curvePoints,
               repeat: parseInt(repeat, 10),
               pixelLength: parseInt(pixelLength, 10)
-            }
+            };
             if (edgeHitSounds) {
-              hitObject.edgeHitSounds = edgeHitSounds.split('|').map(v => parseInt(v, 10))
+              hitObject.edgeHitSounds = edgeHitSounds
+                .split("|")
+                .map(v => parseInt(v, 10));
             }
             if (edgeAdditions) {
-              hitObject.edgeAdditions = edgeAdditions.split('|').map(v => v.split(':')).map(v => ({ sampleSet: parseInt(v[0], 10), additionSet: parseInt(v[1], 10) }))
+              hitObject.edgeAdditions = edgeAdditions
+                .split("|")
+                .map(v => v.split(":"))
+                .map(v => ({
+                  sampleSet: parseInt(v[0], 10),
+                  additionSet: parseInt(v[1], 10)
+                }));
             }
           }
           if (hitType & HitType.Spinner) {
             hitObject = {
               ...hitObject,
               endTime: parseInt(args[0], 10)
-            }
+            };
           }
           switch (beatmap.General.Mode) {
             case 0: {
-              if (hitObject.hitType & HitType.Normal) hitObject = OsuHitObjectFactory.Circle(hitObject)
-              else if (hitObject.hitType & HitType.Slider) hitObject = OsuHitObjectFactory.Slider(hitObject)
-              else if (hitObject.hitType & HitType.Spinner) hitObject = OsuHitObjectFactory.Spinner(hitObject)
+              if (hitObject.hitType & HitType.Normal)
+                hitObject = OsuHitObjectFactory.Circle(hitObject);
+              else if (hitObject.hitType & HitType.Slider)
+                hitObject = OsuHitObjectFactory.Slider(hitObject);
+              else if (hitObject.hitType & HitType.Spinner)
+                hitObject = OsuHitObjectFactory.Spinner(hitObject);
             }
           }
-          beatmap.HitObjects.push(hitObject)
-          break
+          beatmap.HitObjects.push(hitObject);
+          break;
         }
-        case 'TimingPoints': {
-          let args = line.split(',')
+        case "TimingPoints": {
+          let args = line.split(",");
           beatmap.TimingPoints.push({
             time: parseInt(args[0], 10),
             beatLength: parseFloat(args[1]),
@@ -271,147 +308,186 @@ class Beatmap {
             sampleSet: args.length >= 3 ? parseInt(args[3]) : 0,
             sampleIndex: args.length >= 4 ? parseInt(args[4]) : 0,
             volume: args.length >= 5 ? parseInt(args[5]) : 100,
-            inherited: args.length >= 6 ? args[6] === '1' : false,
-            kiai: args.length >= 7 ? args[7] === '1' : false
-          })
-          break
+            inherited: args.length >= 6 ? args[6] === "1" : false,
+            kiai: args.length >= 7 ? args[7] === "1" : false
+          });
+          break;
         }
-        case 'Colours':
-          let [, value] = line.split(':').map(v => v.trim())
-          beatmap.Colours.push(new Colour(...value.split(',').map(v => parseInt(v, 10))))
-          break
-        case 'Events': // TODO: Work on true storyboard support
-          let [type, ...params] = line.split(',')
-          if (type === '0') {
-            beatmap.Events.Background = params[1].replace(/"/g, '')
-          } else if (type === '2') {
-            beatmap.Events.Breaks.push({ start: parseInt(params[0], 10), end: parseInt(params[1], 10) })
+        case "Colours":
+          let [, value] = line.split(":").map(v => v.trim());
+          beatmap.Colours.push(
+            new Colour(...value.split(",").map(v => parseInt(v, 10)))
+          );
+          break;
+        case "Events": // TODO: Work on true storyboard support
+          let [type, ...params] = line.split(",");
+          if (type === "0") {
+            beatmap.Events.Background = params[1].replace(/"/g, "");
+          } else if (type === "2") {
+            beatmap.Events.Breaks.push({
+              start: parseInt(params[0], 10),
+              end: parseInt(params[1], 10)
+            });
           }
-          break
+          break;
       }
     }
-    let parentPoint = beatmap.TimingPoints.find(tp => !tp.inherited)
+    let parentPoint = beatmap.TimingPoints.find(tp => !tp.inherited);
 
     for (const tp of beatmap.TimingPoints) {
-      if (!tp.inherited) parentPoint = tp
+      if (!tp.inherited) parentPoint = tp;
 
-      for (let hitObject of beatmap.HitObjects.filter(ho => ho.startTime >= tp.time)) {
-        if (hitObject.finalize) hitObject.finalize(tp, parentPoint, beatmap)
+      for (let hitObject of beatmap.HitObjects.filter(
+        ho => ho.startTime >= tp.time
+      )) {
+        if (hitObject.finalize) hitObject.finalize(tp, parentPoint, beatmap);
       }
     }
-    return beatmap
+    return beatmap;
   }
 
-  toOsu () { // TODO: Optimize this 3ms takes too long!
-    let data = []
-    data.push(`osu file format v${this.Version}`)
-    data.push('')
-    data.push('[General]')
+  toOsu() {
+    let data = [];
+    data.push(`osu file format v${this.Version}`);
+    data.push("");
+    data.push("[General]");
     for (let key in this.General) {
-      data.push(Crunch(key, this.General[key]))
+      data.push(Crunch(key, this.General[key]));
     }
-    data.push('')
-    data.push('[Editor]')
+    data.push("");
+    data.push("[Editor]");
     for (let key in this.Editor) {
-      data.push(Crunch(key, this.Editor[key]))
+      data.push(Crunch(key, this.Editor[key]));
     }
-    data.push('')
-    data.push('[Metadata]')
+    data.push("");
+    data.push("[Metadata]");
     for (let key in this.Metadata) {
-      data.push(Crunch(key, this.Metadata[key]))
+      data.push(Crunch(key, this.Metadata[key]));
     }
-    data.push('')
-    data.push('[Difficulty]')
+    data.push("");
+    data.push("[Difficulty]");
     for (let key in this.Difficulty) {
-      data.push(Crunch(key, this.Difficulty[key]))
+      data.push(Crunch(key, this.Difficulty[key]));
     }
-    data.push('')
-    data.push('[Colours]')
+    data.push("");
+    data.push("[Colours]");
     for (let colour in this.Colours) {
-      data.push(`Combo${parseInt(colour, 10) + 1}: ${this.Colours[colour].toString()}`)
+      data.push(
+        `Combo${parseInt(colour, 10) + 1}: ${this.Colours[colour].toString()}`
+      );
     }
-    data.push('')
-    data.push('[Events]')
+    data.push("");
+    data.push("[Events]");
     if (this.Events.Background) {
-      data.push(`0,0,"${this.Events.Background}",0,0`)
+      data.push(`0,0,"${this.Events.Background}",0,0`);
     }
     for (let b of this.Events.Breaks) {
-      data.push(`2,${b.start},${b.end}`)
+      data.push(`2,${b.start},${b.end}`);
     }
-    data.push('')
-    data.push('[TimingPoints]')
+    data.push("");
+    data.push("[TimingPoints]");
     for (let tp of this.TimingPoints) {
-      data.push(`${tp.time},${tp.beatLength},${tp.meter},${tp.sampleSet},${tp.sampleIndex},${tp.volume},${+tp.inherited},${+tp.inherited}`)
+      data.push(
+        `${tp.time},${tp.beatLength},${tp.meter},${tp.sampleSet},${
+          tp.sampleIndex
+        },${tp.volume},${+tp.inherited},${+tp.inherited}`
+      );
     }
-    data.push('')
-    data.push('[HitObjects]')
+    data.push("");
+    data.push("[HitObjects]");
     for (let ho of this.HitObjects) {
       if (ho.toOsu) {
-        data.push(ho.toOsu())
+        data.push(ho.toOsu());
       } else {
-        let arrayBuilder = []
-        arrayBuilder.push(ho.pos.x, ho.pos.y, ho.startTime, ho.hitType, ho.hitSound)
+        let arrayBuilder = [];
+        arrayBuilder.push(
+          ho.pos.x,
+          ho.pos.y,
+          ho.startTime,
+          ho.hitType,
+          ho.hitSound
+        );
         if (ho.hitType & HitType.Slider) {
-          arrayBuilder.push(`${ho.curveType}|${ho.curvePoints.map(v => `${v.x}:${v.y}`).join('|')}`, ho.repeat, ho.pixelLength)
+          arrayBuilder.push(
+            `${ho.curveType}|${ho.curvePoints
+              .map(v => `${v.x}:${v.y}`)
+              .join("|")}`,
+            ho.repeat,
+            ho.pixelLength
+          );
           if (ho.edgeHitSounds) {
-            arrayBuilder.push(ho.edgeHitSounds.join('|'), ho.edgeAdditions.map(v => `${v.sampleSet}:${v.additionSet}`).join('|'))
+            arrayBuilder.push(
+              ho.edgeHitSounds.join("|"),
+              ho.edgeAdditions
+                .map(v => `${v.sampleSet}:${v.additionSet}`)
+                .join("|")
+            );
           }
         }
         if (ho.extras) {
-          arrayBuilder.push(`${ho.extras.sampleSet}:${ho.extras.additionSet}:${ho.extras.customIndex}:${ho.extras.sampleVolume}:${ho.extras.filename}`)
+          arrayBuilder.push(
+            `${ho.extras.sampleSet}:${ho.extras.additionSet}:${
+              ho.extras.customIndex
+            }:${ho.extras.sampleVolume}:${ho.extras.filename}`
+          );
         }
-        data.push(arrayBuilder.join(','))
+        data.push(arrayBuilder.join(","));
       }
     }
-    return data.filter(v => v !== null).join('\n')
+    return data.filter(v => v !== null).join("\n");
   }
 
-  static fromJSON (data) {
-    let d = JSON.parse(data)
-    let beatmap = new Beatmap()
-    beatmap.Version = d.Version || beatmap.Version
-    beatmap.General = { ...beatmap.General, ...d.General }
-    beatmap.Metadata = { ...beatmap.Metadata, ...d.Metadata }
-    beatmap.Editor = { ...beatmap.Editor, ...d.Editor }
-    beatmap.Colours = d.Colours ? d.Colours.map(c => new Colour(...c)) : []
-    beatmap.TimingPoints = d.TimingPoints || []
-    beatmap.Events = { ...beatmap.Events, ...d.Events }
+  static fromJSON(data) {
+    let d = JSON.parse(data);
+    let beatmap = new Beatmap();
+    beatmap.Version = d.Version || beatmap.Version;
+    beatmap.General = { ...beatmap.General, ...d.General };
+    beatmap.Metadata = { ...beatmap.Metadata, ...d.Metadata };
+    beatmap.Editor = { ...beatmap.Editor, ...d.Editor };
+    beatmap.Colours = d.Colours ? d.Colours.map(c => new Colour(...c)) : [];
+    beatmap.TimingPoints = d.TimingPoints || [];
+    beatmap.Events = { ...beatmap.Events, ...d.Events };
     beatmap.HitObjects = d.HitObjects.map(hitObject => {
-      hitObject.pos = new Vector2(hitObject.pos.x, hitObject.pos.y)
+      hitObject.pos = new Vector2(hitObject.pos.x, hitObject.pos.y);
       if (hitObject.curvePoints) {
-        hitObject.curvePoints = hitObject.curvePoints.map(curvePoint => new Vector2(curvePoint.x, curvePoint.y))
+        hitObject.curvePoints = hitObject.curvePoints.map(
+          curvePoint => new Vector2(curvePoint.x, curvePoint.y)
+        );
       }
       switch (beatmap.General.Mode) {
         case 0: {
-          if (hitObject.hitType & HitType.Normal) hitObject = OsuHitObjectFactory.Circle(hitObject)
-          else if (hitObject.hitType & HitType.Slider) hitObject = OsuHitObjectFactory.Slider(hitObject)
-          else if (hitObject.hitType & HitType.Spinner) hitObject = OsuHitObjectFactory.Spinner(hitObject)
+          if (hitObject.hitType & HitType.Normal)
+            hitObject = OsuHitObjectFactory.Circle(hitObject);
+          else if (hitObject.hitType & HitType.Slider)
+            hitObject = OsuHitObjectFactory.Slider(hitObject);
+          else if (hitObject.hitType & HitType.Spinner)
+            hitObject = OsuHitObjectFactory.Spinner(hitObject);
         }
       }
-      return hitObject
-    })
-    return beatmap
+      return hitObject;
+    });
+    return beatmap;
   }
 
-  get countNormal () {
-    return this.HitObjects.filter(ho => ho.hitType & HitType.Normal).length
+  get countNormal() {
+    return this.HitObjects.filter(ho => ho.hitType & HitType.Normal).length;
   }
 
-  get countSlider () {
-    return this.HitObjects.filter(ho => ho.hitType & HitType.Slider).length
+  get countSlider() {
+    return this.HitObjects.filter(ho => ho.hitType & HitType.Slider).length;
   }
 
-  get countSpinner () {
-    return this.HitObjects.filter(ho => ho.hitType & HitType.Spinner).length
+  get countSpinner() {
+    return this.HitObjects.filter(ho => ho.hitType & HitType.Spinner).length;
   }
 
-  get countObjects () {
-    return this.HitObjects.length
+  get countObjects() {
+    return this.HitObjects.length;
   }
 
-  get maxCombo () {
-    return this.HitObjects.reduce((a, c) => a + c.combo, 0)
+  get maxCombo() {
+    return this.HitObjects.reduce((a, c) => a + c.combo, 0);
   }
 }
 
-module.exports = Beatmap
+module.exports = Beatmap;
