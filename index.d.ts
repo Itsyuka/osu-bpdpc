@@ -1,15 +1,6 @@
-import Beatmap = require('./src/Beatmap')
-import Colour = require('./src/Colour')
-import Mods = require('./src/Enum/Mods')
-import HitSound = require('./src/Enum/HitSound')
-import HitType = require('./src/Enum/HitType')
-import Vector2 = require('./src/Utils/Vector2')
-
-declare module "osu-bpdpc" {
-    export {Beatmap}
-    export {Colour}
-    export {Mods}
-    export {HitSound}
-    export {HitType}
-    export {Vector2}
-}
+export { default as Beatmap } from './src/Beatmap'
+export { default as Colour } from './src/Colour'
+export { default as Mods } from './src/Enum/Mods'
+export { default as HitSound } from './src/Enum/HitSound'
+export { default as HitType } from './src/Enum/HitType'
+export { default as Vector2 } from './src/Utils/Vector2'

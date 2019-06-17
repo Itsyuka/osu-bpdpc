@@ -1,5 +1,3 @@
-export = Mods;
-
 declare enum Mods {
   None = 0,
   NoFail = 1 << 0,
@@ -34,3 +32,5 @@ declare enum Mods {
   ScoreV2 = 1 << 29,
   LastMod = 1 << 30
 }
+
+export default Mods

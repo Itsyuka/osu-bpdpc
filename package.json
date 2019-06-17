@@ -4,7 +4,8 @@
   "description": "Osu beatmap parser, difficulty and performance calculator",
   "main": "index.js",
   "scripts": {
-    "test": "mocha src/**/*.spec.js"
+    "test": "mocha src/**/*.spec.js",
+    "lint": "eslint **/*.{js,ts} && tsc"
   },
   "keywords": [
     "osu!",
@@ -21,17 +22,16 @@
     "url": "https://github.com/Itsyuka/osu-bpdpc.git"
   },
   "devDependencies": {
-    "eslint": "^4.15.0",
-    "eslint-config-standard": "^11.0.0-beta.0",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0-alpha.0",
+    "eslint-config-standard-with-typescript": "^7.0.0",
     "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "mocha": "^4.1.0",
-    "request": "^2.83.0",
-    "request-promise-native": "^1.0.5"
-  },
-  "dependencies": {
-    "@types/node": "^9.3.0"
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^6.1.4",
+    "typescript": "^3.4.5"
   }
 }

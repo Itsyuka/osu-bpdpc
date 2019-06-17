@@ -2,7 +2,7 @@ const HitObject = require('./HitObject')
 
 class Slider extends HitObject {
   constructor (hitObject) {
-    super({...hitObject, endTime: hitObject.endTime || hitObject.startTime})
+    super({ ...hitObject, endTime: hitObject.endTime || hitObject.startTime })
     this.curveType = hitObject.curveType
     this.curvePoints = hitObject.curvePoints
     this.repeat = hitObject.repeat
@@ -18,7 +18,7 @@ class Slider extends HitObject {
     if (timingPoint.inherited && timingPoint.beatLength < 0) velocityMultiplier = -100 / timingPoint.beatLength
     let pixelsPerBeat = beatmap.Difficulty.SliderMultiplier * 100 * velocityMultiplier
     let beats = this.pixelLength * this.repeat / pixelsPerBeat
-    let duration = Math.ceil(beats * parentTimingPoint.beatLength)
+    let duration = Math.ceil(beats * parentTimingPoint ? parentTimingPoint.beatLength : 1)
     this.endTime = this.startTime + duration
     this.combo = Math.ceil((beats - 0.01) / this.repeat * beatmap.Difficulty.SliderTickRate) - 1
     this.combo *= this.repeat
