@@ -204,7 +204,7 @@ class Beatmap {
             hitType: parseInt(hitType, 10),
             hitSound: parseInt(hitSound)
           };
-          if (args[args.length - 1].includes(":")) {
+          if (args.length && args[args.length - 1].includes(":")) {
             // some sliders don't use the extras
             if (hitType & HitType.Hold) {
               let [
