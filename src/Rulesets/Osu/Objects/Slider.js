@@ -15,19 +15,26 @@ class Slider extends HitObject {
 
   finalize(timingPoint, parentTimingPoint, beatmap) {
     let velocityMultiplier = 1;
-    if (timingPoint.inherited && timingPoint.beatLength < 0)
+    let difficulty = beatmap.Difficulty;
+
+    if (!timingPoint.inherited && timingPoint.beatLength < 0) {
       velocityMultiplier = -100 / timingPoint.beatLength;
-    let pixelsPerBeat =
-      beatmap.Difficulty.SliderMultiplier * 100 * velocityMultiplier;
+    }
+      
+    let pixelsPerBeat = difficulty.SliderMultiplier * 100;
+    
+    if (beatmap.Version >= 8) {
+      pixelsPerBeat *= velocityMultiplier;
+    }
+    
     let beats = (this.pixelLength * this.repeat) / pixelsPerBeat;
-    let duration = Math.ceil(
-      beats * parentTimingPoint ? parentTimingPoint.beatLength : 1
-    );
+    let parentBeatLength = parentTimingPoint ? parentTimingPoint.beatLength : 1;
+    let duration = Math.ceil(beats * parentBeatLength);
+
     this.endTime = this.startTime + duration;
     this.combo =
-      Math.ceil(
-        ((beats - 0.01) / this.repeat) * beatmap.Difficulty.SliderTickRate
-      ) - 1;
+      Math.ceil((beats - 0.1) / this.repeat * difficulty.SliderTickRate) - 1;
+    
     this.combo *= this.repeat;
     this.combo += this.repeat + 1;
   }
