@@ -182,7 +182,8 @@ class Beatmap {
               break;
             case "OverallDifficulty":
               beatmap[section][key] = parseFloat(value);
-              break;
+              key = "ApproachRate";
+              if (beatmap[section][key]) break;
             case "ApproachRate":
               beatmap[section][key] = parseFloat(value);
               break;
