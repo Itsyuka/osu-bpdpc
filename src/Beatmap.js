@@ -338,6 +338,11 @@ class Beatmap {
     for (const tp of beatmap.TimingPoints) {
       if (!tp.inherited) parentPoint = tp;
 
+      let bpm = Math.round(60000 / tp.beatLength);
+
+      beatmap.General.MinBPM = Math.min(beatmap.General.MinBPM, bpm) || bpm;
+      beatmap.General.MaxBPM = Math.max(beatmap.General.MaxBPM, bpm) || bpm;
+      
       for (let hitObject of beatmap.HitObjects.filter(
         ho => ho.startTime >= tp.time
       )) {
