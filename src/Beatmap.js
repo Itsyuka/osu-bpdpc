@@ -3,6 +3,7 @@ const Colour = require("./Colour");
 const Crunch = require("./Utils/OsuCruncher");
 const HitType = require("./Enum/HitType");
 const OsuHitObjectFactory = require("./Rulesets/Osu/HitObjectFactory");
+const SliderCalc = require("./Utils/SliderCalc");
 
 class Beatmap {
   constructor() {
@@ -253,7 +254,7 @@ class Beatmap {
               repeat,
               pixelLength,
               edgeHitSounds,
-              edgeAdditions
+              edgeAdditions,
             ] = args;
             let [type, ...curves] = curvyBits.split("|");
             let curvePoints = curves
@@ -262,10 +263,17 @@ class Beatmap {
             hitObject = {
               ...hitObject,
               curveType: type,
-              curvePoints,
+              curvePoints: [curvePoints[0], ...curvePoints],
               repeat: parseInt(repeat, 10),
-              pixelLength: parseInt(pixelLength, 10)
+              pixelLength: parseInt(pixelLength, 10),
             };
+
+            hitObject.endPos = SliderCalc.getEndPoint(
+              hitObject.curveType, 
+              hitObject.pixelLength, 
+              hitObject.curvePoints
+            );
+            
             if (edgeHitSounds) {
               hitObject.edgeHitSounds = edgeHitSounds
                 .split("|")
