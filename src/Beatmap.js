@@ -299,7 +299,7 @@ class Beatmap {
           if (hitType & HitType.Spinner) {
             hitObject = {
               ...hitObject,
-              endPos: pos,
+              endPos: hitObject.pos,
               endTime: parseInt(args[0], 10)
             };
           }
