@@ -2,7 +2,11 @@ const HitObject = require("./HitObject");
 
 class Circle extends HitObject {
   constructor(hitObject) {
-    super({ ...hitObject, endTime: hitObject.startTime });
+    super({ 
+      ...hitObject, 
+      endPos: hitObject.startPos,
+      endTime: hitObject.startTime 
+    });
   }
 
   toOsu() {

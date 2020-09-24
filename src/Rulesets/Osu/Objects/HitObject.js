@@ -3,6 +3,7 @@ const HitType = require("../../../Enum/HitType");
 class HitObject {
   constructor({
     pos,
+    endPos,
     startTime,
     endTime,
     hitType,
@@ -11,6 +12,7 @@ class HitObject {
     combo = 1
   }) {
     this.pos = pos;
+    this.endPos = endPos;
     this.startTime = startTime;
     this.endTime = endTime;
     this.hitType = hitType;

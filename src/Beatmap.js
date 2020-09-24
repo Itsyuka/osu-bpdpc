@@ -274,7 +274,7 @@ class Beatmap {
               hitObject.curvePoints
             );
             
-            if (endPoint && endPoint.x && endPoint.x) {
+            if (endPoint && endPoint.x && endPoint.y) {
               hitObject.endPos = endPoint;
             } else {
               // If endPosition could not be calculated, approximate it by setting it to the last point
@@ -299,6 +299,7 @@ class Beatmap {
           if (hitType & HitType.Spinner) {
             hitObject = {
               ...hitObject,
+              endPos: pos,
               endTime: parseInt(args[0], 10)
             };
           }
