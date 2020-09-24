@@ -14,12 +14,12 @@ exports.getEndPoint = function (sliderType, sliderLength, points) {
   if (!sliderType || !sliderLength || !points) return;
 
   switch (sliderType) {
-    case 'linear':
+    case 'L':
       return pointOnLine(points[0], points[1], sliderLength);
-    case 'catmull':
+    case 'C':
       // not supported, anyway it's only used in old beatmaps
       return undefined;
-    case 'bezier':
+    case 'B':
       if (!points || points.length < 2) { return undefined; }
       if (points.length == 2) { return pointOnLine(points[0], points[1], sliderLength); }
 
@@ -47,10 +47,10 @@ exports.getEndPoint = function (sliderType, sliderLength, points) {
 
       bezier = new Bezier(pts);
       return bezier.pointAtDistance(sliderLength);
-    case 'pass-through':
+    case 'P':
       if (!points || points.length < 2) { return undefined; }
       if (points.length == 2) { return pointOnLine(points[0], points[1], sliderLength); }
-      if (points.length > 3)  { return exports.getEndPoint('bezier', sliderLength, points); }
+      if (points.length > 3)  { return exports.getEndPoint('B', sliderLength, points); }
 
       var p1 = points[0];
       var p2 = points[1];
