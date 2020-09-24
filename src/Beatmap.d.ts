@@ -12,6 +12,8 @@ export default class Beatmap {
     SampleSet: string;
     StackLeniency: number;
     Mode: number;
+    MinBPM: number;
+    MaxBPM: number;
     LetterboxInBreaks: boolean;
     WidescreenStoryboard: boolean;
   };
