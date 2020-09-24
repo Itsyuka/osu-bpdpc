@@ -268,12 +268,19 @@ class Beatmap {
               pixelLength: parseInt(pixelLength, 10),
             };
 
-            hitObject.endPos = SliderCalc.getEndPoint(
+            let endPoint = SliderCalc.getEndPoint(
               hitObject.curveType, 
               hitObject.pixelLength, 
               hitObject.curvePoints
             );
             
+            if (endPoint && endPoint.x && endPoint.x) {
+              hitObject.endPos = endPoint;
+            } else {
+              // If endPosition could not be calculated, approximate it by setting it to the last point
+              hitObject.endPos = hitObject.curvePoints[hitObject.curvePoints.length - 1];
+            }
+
             if (edgeHitSounds) {
               hitObject.edgeHitSounds = edgeHitSounds
                 .split("|")
