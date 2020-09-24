@@ -1,5 +1,7 @@
 'use strict';
 
+const Vector2 = require('./Vector2');
+
 function distancePoints(p1, p2)
 {
   let x = (p1[0] - p2[0]);
@@ -41,19 +43,11 @@ function pointAtDistance(array, distance)
   if (array.length < 2) return [0, 0, 0, 0];
 
   if (distance === 0) {
-    let angle = angleFromPoints(array[0], array[1]);
-    return [array[0][0], array[0][1], angle, 0];
+    return new Vector2(array[0][0], array[0][1]);
   }
 
   if (distanceFromPoints(array) <= distance) {
-    let angle = angleFromPoints(array[array.length - 2], array[array.length - 1]);
-    
-    return [
-      array[array.length - 1][0],
-      array[array.length - 1][1],
-      angle,
-      array.length - 2
-    ];
+    return new Vector2(array[array.length - 1][0], array[array.length - 1][1]);
   }
 
   for (var i = 0, len = array.length - 2; i <= len; ++i) {
@@ -82,7 +76,7 @@ function pointAtDistance(array, distance)
       coord = [(array[i][0] + cart[0]), (array[i][1] + cart[1])];
   }
 
-  return [coord[0], coord[1], angle, i];
+  return new Vector2(coord[0], coord[1]);
 }
 
 function Cpn(p, n)
@@ -238,7 +232,7 @@ Bezier.prototype.pointAtDistance = Catmull.prototype.pointAtDistance = function 
       return this.points[0];
     default:
       this.calcPoints();
-      return pointAtDistance(array_values(this.pos), dist).slice(0, 2);
+      return pointAtDistance(array_values(this.pos), dist);
   }
 };
 
