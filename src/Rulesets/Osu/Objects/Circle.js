@@ -4,7 +4,7 @@ class Circle extends HitObject {
   constructor(hitObject) {
     super({ 
       ...hitObject, 
-      endPos: hitObject.startPos,
+      endPos: hitObject.pos,
       endTime: hitObject.startTime 
     });
   }
