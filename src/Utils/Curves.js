@@ -56,7 +56,7 @@ function pointAtDistance(array, distance)
     ];
   }
 
-  for (let i = 0; i <= array.length - 2; i++) {
+  for (var i = 0, len = array.length - 2; i <= len; ++i) {
     let x = (array[i][0] - array[i + 1][0]);
     let y = (array[i][1] - array[i + 1][1]);
 
@@ -91,7 +91,7 @@ function Cpn(p, n)
     return 0;
   }
     
-  let p = Math.min(p, n - p);
+  p = Math.min(p, n - p);
   let out = 1;
 
   for (let i = 1; i < p + 1; i++) {
