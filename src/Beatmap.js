@@ -263,7 +263,7 @@ class Beatmap {
             hitObject = {
               ...hitObject,
               curveType: type,
-              curvePoints: [curvePoints[0], ...curvePoints],
+              curvePoints,
               repeat: parseInt(repeat, 10),
               pixelLength: parseInt(pixelLength, 10),
             };

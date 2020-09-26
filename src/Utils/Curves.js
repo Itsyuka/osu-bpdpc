@@ -213,7 +213,7 @@ class Catmull
 
   calcPoints()
   {
-    if (this.pos.length) {
+    if (Object.keys(this.pos).length) {
       return;
     }
 
