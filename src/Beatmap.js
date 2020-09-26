@@ -356,8 +356,10 @@ class Beatmap {
 
       let bpm = Math.round(60000 / tp.beatLength);
 
-      beatmap.General.MinBPM = Math.min(beatmap.General.MinBPM, bpm) || bpm;
-      beatmap.General.MaxBPM = Math.max(beatmap.General.MaxBPM, bpm) || bpm;
+      if (bpm > 0) {
+        beatmap.General.MinBPM = Math.min(beatmap.General.MinBPM, bpm) || bpm;
+        beatmap.General.MaxBPM = Math.max(beatmap.General.MaxBPM, bpm) || bpm;
+      }
       
       for (let hitObject of beatmap.HitObjects.filter(
         ho => ho.startTime >= tp.time
