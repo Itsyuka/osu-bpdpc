@@ -20,6 +20,11 @@ export default class Vector2 {
   public scale(multiplier: number): Vector2;
 
   /**
+   * Divides the vector and returns a new instance.
+   */
+  public divide(divisor: number): Vector2;
+
+  /**
    * Returns the length of the 2 points in the vector
    */
   public length(): number;
@@ -28,6 +33,11 @@ export default class Vector2 {
    * Returns the distance between 2 vectors
    */
   public distance(vec: Vector2): number;
+
+  /**
+   * Returns normaliled vector
+   */
+  public normalize(): Vector2;
 
   /**
    * Clones the current vector and returns it
