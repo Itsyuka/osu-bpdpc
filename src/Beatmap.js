@@ -3,7 +3,7 @@ const Colour = require("./Colour");
 const Crunch = require("./Utils/OsuCruncher");
 const HitType = require("./Enum/HitType");
 const OsuHitObjectFactory = require("./Rulesets/Osu/HitObjectFactory");
-const SliderCalc = require("./Utils/SliderCalc");
+const {SliderPath, PathControlPoint} = require("./Utils/SliderPath");
 
 class Beatmap {
   constructor() {
@@ -268,14 +268,24 @@ class Beatmap {
               pixelLength: parseInt(pixelLength, 10),
             };
 
-            let endPoint = SliderCalc.getEndPoint(
-              hitObject.curveType, 
-              hitObject.pixelLength, 
-              hitObject.curvePoints
+            hitObject.pathPoints = [new PathControlPoint(
+              new Vector2(0, 0), hitObject.curveType
+            )];
+
+            hitObject.curvePoints.forEach(x => {
+              let point = new PathControlPoint(x.subtract(hitObject.pos));
+
+              hitObject.pathPoints.push(point);
+            });
+
+            let sliderPath = new SliderPath(
+              hitObject.pathPoints, hitObject.pixelLength
             );
+
+            let endPoint = sliderPath.positionAt(1);
             
             if (endPoint && endPoint.x && endPoint.y) {
-              hitObject.endPos = endPoint;
+              hitObject.endPos = hitObject.pos.add(endPoint);
             } else {
               // If endPosition could not be calculated, approximate it by setting it to the last point
               hitObject.endPos = hitObject.curvePoints[hitObject.curvePoints.length - 1];
