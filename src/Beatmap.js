@@ -3,6 +3,7 @@ const Colour = require("./Colour");
 const Crunch = require("./Utils/OsuCruncher");
 const HitType = require("./Enum/HitType");
 const OsuHitObjectFactory = require("./Rulesets/Osu/HitObjectFactory");
+const {SliderPath, PathControlPoint} = require("./Utils/SliderPath");
 
 class Beatmap {
   constructor() {
@@ -182,7 +183,8 @@ class Beatmap {
               break;
             case "OverallDifficulty":
               beatmap[section][key] = parseFloat(value);
-              break;
+              key = "ApproachRate";
+              if (beatmap[section][key]) break;
             case "ApproachRate":
               beatmap[section][key] = parseFloat(value);
               break;
@@ -204,7 +206,7 @@ class Beatmap {
             hitType: parseInt(hitType, 10),
             hitSound: parseInt(hitSound)
           };
-          if (args[args.length - 1].includes(":")) {
+          if (args.length && args[args.length - 1].includes(":")) {
             // some sliders don't use the extras
             if (hitType & HitType.Hold) {
               let [
@@ -252,7 +254,7 @@ class Beatmap {
               repeat,
               pixelLength,
               edgeHitSounds,
-              edgeAdditions
+              edgeAdditions,
             ] = args;
             let [type, ...curves] = curvyBits.split("|");
             let curvePoints = curves
@@ -263,8 +265,32 @@ class Beatmap {
               curveType: type,
               curvePoints,
               repeat: parseInt(repeat, 10),
-              pixelLength: parseInt(pixelLength, 10)
+              pixelLength: parseInt(pixelLength, 10),
             };
+
+            hitObject.pathPoints = [new PathControlPoint(
+              new Vector2(0, 0), hitObject.curveType
+            )];
+
+            hitObject.curvePoints.forEach(x => {
+              let point = new PathControlPoint(x.subtract(hitObject.pos));
+
+              hitObject.pathPoints.push(point);
+            });
+
+            let sliderPath = new SliderPath(
+              hitObject.pathPoints, hitObject.pixelLength
+            );
+
+            let endPoint = sliderPath.positionAt(1);
+            
+            if (endPoint && endPoint.x && endPoint.y) {
+              hitObject.endPos = hitObject.pos.add(endPoint);
+            } else {
+              // If endPosition could not be calculated, approximate it by setting it to the last point
+              hitObject.endPos = hitObject.curvePoints[hitObject.curvePoints.length - 1];
+            }
+
             if (edgeHitSounds) {
               hitObject.edgeHitSounds = edgeHitSounds
                 .split("|")
@@ -283,6 +309,7 @@ class Beatmap {
           if (hitType & HitType.Spinner) {
             hitObject = {
               ...hitObject,
+              endPos: hitObject.pos,
               endTime: parseInt(args[0], 10)
             };
           }
@@ -337,6 +364,13 @@ class Beatmap {
     for (const tp of beatmap.TimingPoints) {
       if (!tp.inherited) parentPoint = tp;
 
+      let bpm = Math.round(60000 / tp.beatLength);
+
+      if (bpm > 0) {
+        beatmap.General.MinBPM = Math.min(beatmap.General.MinBPM, bpm) || bpm;
+        beatmap.General.MaxBPM = Math.max(beatmap.General.MaxBPM, bpm) || bpm;
+      }
+      
       for (let hitObject of beatmap.HitObjects.filter(
         ho => ho.startTime >= tp.time
       )) {
