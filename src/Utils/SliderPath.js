@@ -3,26 +3,18 @@ const Vector2 = require('./Vector2');
 
 class SliderPath
 {
-  /**
-   * The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
-   * and the path will be shortened/lengthened to match this length.
-   */
-  expectedDistance;
-
-  /**
-   * The control points of the path.
-   */
-  controlPoints;
-
-  calculatedPath;
-  cumulativeLength;
-  #pathCache;
-
-  calculatedLength;
 
   constructor(controlPoints, expectedDistance = null)
   {
+    /**
+     * The control points of the path.
+     */
     this.controlPoints = controlPoints.slice();
+
+    /**
+     * The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
+     * and the path will be shortened/lengthened to match this length.
+     */
     this.expectedDistance = expectedDistance;
   }
 
@@ -31,7 +23,7 @@ class SliderPath
    */
   get distance()
   {
-    this.#ensureValid();
+    this._ensureValid();
 
     return this.cumulativeLength.length === 0 
       ? 0 : this.cumulativeLength[this.cumulativeLength.length - 1];
@@ -42,7 +34,7 @@ class SliderPath
    */
   get calculatedDistance()
   {
-    this.#ensureValid();
+    this._ensureValid();
 
     return this.calculatedLength;
   }
@@ -56,22 +48,22 @@ class SliderPath
    */
   getPathToProgress(path, p0, p1)
   {
-    this.#ensureValid();
+    this._ensureValid();
 
-    let d0 = this.#progressToDistance(p0);
-    let d1 = this.#progressToDistance(p1);
+    let d0 = this._progressToDistance(p0);
+    let d1 = this._progressToDistance(p1);
 
     let i = 0;
 
     while (i < this.calculatedPath.length && this.cumulativeLength[i++] < d0);
 
-    path = [this.#interpolateVertices(i, d0)];
+    path = [this._interpolateVertices(i, d0)];
 
     while (i < this.calculatedPath.length && this.cumulativeLength[i++] <= d1) {
       path.push(this.calculatedPath[i]);
     }
 
-    path.push(this.#interpolateVertices(i, d1));
+    path.push(this._interpolateVertices(i, d1));
   }
 
   /**
@@ -81,26 +73,26 @@ class SliderPath
    */
   positionAt(progress)
   {
-    this.#ensureValid();
+    this._ensureValid();
 
-    let d = this.#progressToDistance(progress);
+    let d = this._progressToDistance(progress);
 
-    return this.#interpolateVertices(this.#indexOfDistance(d), d);
+    return this._interpolateVertices(this._indexOfDistance(d), d);
   }
 
-  #ensureValid()
+  _ensureValid()
   {
-    if (this.#pathCache) {
+    if (this._pathCache) {
       return;
     }
 
-    this.#calculatePath();
-    this.#calculateLength();
+    this._calculatePath();
+    this._calculateLength();
 
-    this.#pathCache = true;
+    this._pathCache = true;
   }
 
-  #calculatePath()
+  _calculatePath()
   {
     let controlPointsLength = this.controlPoints.length;
 
@@ -127,7 +119,7 @@ class SliderPath
       let segmentVertices = vertices.slice(start, i + 1);
       let segmentType = this.controlPoints[start].type || 'L';
 
-      for (let t of this.#calculateSubPath(segmentVertices, segmentType)) {
+      for (let t of this._calculateSubPath(segmentVertices, segmentType)) {
         if (this.calculatedPath.length === 0 
           || this.calculatedPath[this.calculatedPath.length - 1] != t) {
           this.calculatedPath.push(t);
@@ -139,7 +131,7 @@ class SliderPath
     }
   }
 
-  #calculateSubPath(subControlPoints, type)
+  _calculateSubPath(subControlPoints, type)
   {
     switch (type) {
       case 'L':
@@ -167,7 +159,7 @@ class SliderPath
     return PathApproximator.approximateBezier(subControlPoints);
   }
 
-  #calculateLength()
+  _calculateLength()
   {
     this.calculatedLength = 0;
     this.cumulativeLength = [0];
@@ -212,16 +204,16 @@ class SliderPath
     }
   }
 
-  #indexOfDistance(d)
+  _indexOfDistance(d)
   {
-    let i = this.#binarySearch(this.cumulativeLength, d);
+    let i = this._binarySearch(this.cumulativeLength, d);
 
     if (i < 0) i = ~i;
 
     return i;
   }
 
-  #binarySearch(arr, x)
+  _binarySearch(arr, x)
   {
     let start = 0, mid, end = arr.length - 1;
 
@@ -242,12 +234,12 @@ class SliderPath
     return Math.floor((start + end) / 2);
   }
 
-  #progressToDistance(progress)
+  _progressToDistance(progress)
   {
     return Math.min(Math.max(progress, 0), 1) * this.distance;
   }
 
-  #interpolateVertices(i, d)
+  _interpolateVertices(i, d)
   {
     if (this.calculatedPath.length === 0)
       return new Vector2(0, 0);
