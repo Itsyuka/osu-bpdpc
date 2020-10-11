@@ -4,7 +4,7 @@
   "description": "Osu beatmap parser, difficulty and performance calculator",
   "main": "index.js",
   "engines": {
-    "node": ">=8.6.0",
+    "node": ">=8.3.0",
     "npm": ">=5.3.0"
   },
   "scripts": {
