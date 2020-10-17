@@ -1,18 +1,18 @@
 const Vector2 = require('./Vector2');
 
+const bezier_tolerance = Math.fround(0.25);
+const circular_arc_tolerance = Math.fround(0.1);
+
+/**
+ * The amount of pieces to calculate for each control point quadruplet.
+ */
+const catmull_detail = 50;
+
 /**
  * Helper methods to approximate a path by interpolating a sequence of control points.
  */
 class PathApproximator
 {
-  static #bezier_tolerance = Math.fround(0.25);
-  static #circular_arc_tolerance = Math.fround(0.1);
-
-  /**
-   * The amount of pieces to calculate for each control point quadruplet.
-   */
-  static #catmull_detail = 50;
-  
   /**
    * Creates a piecewise-linear approximation of a bezier curve, by adaptively repeatedly subdividing
    * the control points until their approximation error vanishes below a given threshold.
@@ -38,12 +38,12 @@ class PathApproximator
     while (toFlatten.length > 0) {
       let parent = toFlatten.pop();
 
-      if (PathApproximator.#bezierIsFlatEnough(parent)) {
+      if (PathApproximator._bezierIsFlatEnough(parent)) {
         // If the control points we currently operate on are sufficiently "flat", we use
         // an extension to De Casteljau's algorithm to obtain a piecewise-linear approximation
         // of the bezier curve represented by our control points, consisting of the same amount
         // of points as there are control points.
-        PathApproximator.#bezierApproximate(parent, output, subdivisionBuffer1, subdivisionBuffer2, count);
+        PathApproximator._bezierApproximate(parent, output, subdivisionBuffer1, subdivisionBuffer2, count);
 
         freeBuffers.push(parent);
         continue;
@@ -53,7 +53,7 @@ class PathApproximator
       // subdividing the curve we are currently operating on.
       let rightChild = freeBuffers.length > 0 ? freeBuffers.pop() : [];
 
-      PathApproximator.#bezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, count);
+      PathApproximator._bezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, count);
 
       // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
       for (let i = 0; i < count; ++i) {
@@ -84,9 +84,9 @@ class PathApproximator
       let v3 = i < controlPointsLength - 1 ? controlPoints[i + 1] : v2.add(v2).subtract(v1);
       let v4 = i < controlPointsLength - 2 ? controlPoints[i + 2] : v3.add(v3).subtract(v2);
 
-      for (let c = 0; c < PathApproximator.#catmull_detail; c++) {
-        result.push(PathApproximator.#catmullFindPoint(v1, v2, v3, v4, Math.fround(c) / PathApproximator.#catmull_detail));
-        result.push(PathApproximator.#catmullFindPoint(v1, v2, v3, v4, Math.fround(c + 1) / PathApproximator.#catmull_detail));
+      for (let c = 0; c < catmull_detail; c++) {
+        result.push(PathApproximator._catmullFindPoint(v1, v2, v3, v4, Math.fround(c) / catmull_detail));
+        result.push(PathApproximator._catmullFindPoint(v1, v2, v3, v4, Math.fround(c + 1) / catmull_detail));
       }
     }
 
@@ -157,8 +157,8 @@ class PathApproximator
     // is: 2 * Math.Acos(1 - TOLERANCE / r)
     // The special case is required for extremely short sliders where the radius is smaller than
     // the tolerance. This is a pathological rather than a realistic case.
-    let amountPoints = 2 * r <= PathApproximator.#circular_arc_tolerance ? 2
-      : Math.max(2, Math.ceil(thetaRange / (2 * Math.acos(1 - PathApproximator.#circular_arc_tolerance / r))));
+    let amountPoints = 2 * r <= circular_arc_tolerance ? 2
+      : Math.max(2, Math.ceil(thetaRange / (2 * Math.acos(1 - circular_arc_tolerance / r))));
 
     let output = [];
     let fract, theta, o;
@@ -196,7 +196,7 @@ class PathApproximator
 
     let result = [];
 
-    let weights = PathApproximator.#barycentricWeights(controlPoints);
+    let weights = PathApproximator._barycentricWeights(controlPoints);
 
     let minX = controlPoints[0].x;
     let maxX = controlPoints[0].x;
@@ -210,7 +210,7 @@ class PathApproximator
 
     for (let i = 0; i < num_steps; i++) {
       let x = minX + dx / (num_steps - 1) * i;
-      let y = Math.fround(PathApproximator.#barycentricLagrange(controlPoints, weights, x));
+      let y = Math.fround(PathApproximator._barycentricLagrange(controlPoints, weights, x));
 
       result.push(new Vector2(x, y));
     }
@@ -223,7 +223,7 @@ class PathApproximator
    * Can be used as a helper function to compute a Lagrange polynomial repeatedly.
    * @param points An array of coordinates. No two x should be the same.
    */
-  static #barycentricWeights(points)
+  static _barycentricWeights(points)
   {
     let n = points.length;
     let w = [];
@@ -249,7 +249,7 @@ class PathApproximator
    * @param weights An array of precomputed barycentric weights.
    * @param time The x coordinate to calculate the basis polynomial for.
    */
-  static #barycentricLagrange(points, weights, time)
+  static _barycentricLagrange(points, weights, time)
   {
     if (points === null || points.Length === 0) {
       throw new Error("points must contain at least one point");
@@ -285,7 +285,7 @@ class PathApproximator
    * @param controlPoints The control points to check for flatness.
    * @returns Whether the control points are flat enough.
    */
-  static #bezierIsFlatEnough(controlPoints)
+  static _bezierIsFlatEnough(controlPoints)
   {
     let sub, sum, scale;
 
@@ -294,7 +294,7 @@ class PathApproximator
       sub = controlPoints[i - 1].subtract(scale);
       sum = sub.add(controlPoints[i + 1]);
 
-      if (sum.length() ** 2 > PathApproximator.#bezier_tolerance ** 2 * 4) {
+      if (sum.length() ** 2 > bezier_tolerance ** 2 * 4) {
         return false;
       }
     }
@@ -312,7 +312,7 @@ class PathApproximator
    * @param subdivisionBuffer The first buffer containing the current subdivision state.
    * @param count The number of control points in the original list.
    */
-  static #bezierSubdivide(controlPoints, l, r, subdivisionBuffer, count)
+  static _bezierSubdivide(controlPoints, l, r, subdivisionBuffer, count)
   {
     let midpoints = subdivisionBuffer;
 
@@ -339,12 +339,12 @@ class PathApproximator
    * @param subdivisionBuffer1 The first buffer containing the current subdivision state.
    * @param subdivisionBuffer2 The second buffer containing the current subdivision state.
    */
-  static #bezierApproximate(controlPoints, output, subdivisionBuffer1, subdivisionBuffer2, count)
+  static _bezierApproximate(controlPoints, output, subdivisionBuffer1, subdivisionBuffer2, count)
   {
     let l = subdivisionBuffer2;
     let r = subdivisionBuffer1;
 
-    PathApproximator.#bezierSubdivide(controlPoints, l, r, subdivisionBuffer1, count);
+    PathApproximator._bezierSubdivide(controlPoints, l, r, subdivisionBuffer1, count);
 
     for (let i = 0; i < count - 1; ++i) {
       l[count + i] = r[i + 1];
@@ -369,7 +369,7 @@ class PathApproximator
    * @param t The parameter at which to find the point on the spline, in the range [0, 1].
    * @returns The point on the spline at t.
    */
-  static #catmullFindPoint(vec1, vec2, vec3, vec4, t)
+  static _catmullFindPoint(vec1, vec2, vec3, vec4, t)
   {
     let t2 = Math.fround(t * t);
     let t3 = Math.fround(t * t2);
