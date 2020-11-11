@@ -137,7 +137,11 @@ class Beatmap {
           break;
         }
         case "Metadata": {
-          let [key, value] = line.split(":").map(v => v.trim());
+          let [key, ...value] = line.split(":");
+
+          key = key.trim();
+          value = value.join(':').trim();
+          
           switch (key) {
             case "Title":
               beatmap[section][key] = value;
