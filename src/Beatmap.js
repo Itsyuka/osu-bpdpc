@@ -282,13 +282,15 @@ class Beatmap {
               hitObject.pathPoints.push(point);
             });
 
-            hitObject.path = new SliderPath(
+            let path = new SliderPath(
               hitObject.pathPoints, hitObject.pixelLength
             );
 
-            let endPoint = hitObject.path.positionAt(1);
+            let endPoint = path.positionAt(path.progressAt(hitObject, 1));
             
-            if (endPoint && endPoint.x && endPoint.y) {
+            hitObject.path = path;
+
+            if (endPoint && !isNaN(endPoint.x) && !isNaN(endPoint.y)) {
               hitObject.endPos = hitObject.pos.add(endPoint);
             } else {
               // If endPosition could not be calculated, approximate it by setting it to the last point
