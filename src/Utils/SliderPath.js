@@ -94,13 +94,13 @@ class SliderPath
 
   _calculatePath()
   {
+    this.calculatedPath = [];
+
     let controlPointsLength = this.controlPoints.length;
 
     if (controlPointsLength === 0) {
       return;
     }
-
-    this.calculatedPath = [];
 
     let vertices = [];
 
@@ -120,8 +120,9 @@ class SliderPath
       let segmentType = this.controlPoints[start].type || 'L';
 
       for (let t of this._calculateSubPath(segmentVertices, segmentType)) {
-        if (this.calculatedPath.length === 0 
-          || this.calculatedPath[this.calculatedPath.length - 1] != t) {
+        let last = this.calculatedPath[this.calculatedPath.length - 1];
+
+        if (this.calculatedPath.length === 0 || !last.equals(t)) {
           this.calculatedPath.push(t);
         }
       }

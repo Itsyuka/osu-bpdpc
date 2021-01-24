@@ -76,7 +76,7 @@ class PathApproximator
   static approximateCatmull(controlPoints)
   {
     let result = [];
-    let controlPointsLength = controlPoints.Length;
+    let controlPointsLength = controlPoints.length;
 
     for (let i = 0; i < controlPointsLength - 1; i++) {
       let v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
