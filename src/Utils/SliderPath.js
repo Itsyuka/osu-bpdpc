@@ -67,6 +67,18 @@ class SliderPath
   }
 
   /**
+   * Computes the progress along the curve relative to how much of the hit object has been completed.
+   * @param obj the curve.
+   * @param progress where 0 is the start time of the hit object and 1 is the end time of the hit object.
+   */
+  progressAt(obj, progress)
+  {
+    let p = progress * obj.repeat % 1;
+
+    return Math.trunc(progress * obj.repeat) % 2 ? 1 - p : p;
+  }
+
+  /**
    * Computes the position on the slider at a given progress that ranges from 0 (beginning of the path)
    * to 1 (end of the path).
    * @param progress Ranges from 0 (beginning of the path) to 1 (end of the path).
