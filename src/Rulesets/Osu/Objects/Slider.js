@@ -6,37 +6,12 @@ class Slider extends HitObject {
     this.curveType = hitObject.curveType;
     this.curvePoints = hitObject.curvePoints;
     this.repeat = hitObject.repeat;
+    this.path = hitObject.path;
     this.pixelLength = hitObject.pixelLength;
     if (hitObject.edgeHitSounds) {
       this.edgeHitSounds = hitObject.edgeHitSounds;
       this.edgeAdditions = hitObject.edgeAdditions;
     }
-  }
-
-  finalize(timingPoint, parentTimingPoint, beatmap) {
-    let velocityMultiplier = 1;
-    let difficulty = beatmap.Difficulty;
-
-    if (!timingPoint.inherited && timingPoint.beatLength < 0) {
-      velocityMultiplier = -100 / timingPoint.beatLength;
-    }
-      
-    let pixelsPerBeat = difficulty.SliderMultiplier * 100;
-    
-    if (beatmap.Version >= 8) {
-      pixelsPerBeat *= velocityMultiplier;
-    }
-    
-    let beats = (this.pixelLength * this.repeat) / pixelsPerBeat;
-    let parentBeatLength = parentTimingPoint ? parentTimingPoint.beatLength : 1;
-    let duration = Math.ceil(beats * parentBeatLength);
-
-    this.endTime = this.startTime + duration;
-    this.combo =
-      Math.ceil((beats - 0.1) / this.repeat * difficulty.SliderTickRate) - 1;
-    
-    this.combo *= this.repeat;
-    this.combo += this.repeat + 1;
   }
 
   toOsu() {
