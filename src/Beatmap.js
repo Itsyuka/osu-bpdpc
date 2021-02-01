@@ -290,11 +290,13 @@ class Beatmap {
             
             hitObject.path = path;
 
-            if (endPoint && !isNaN(endPoint.x) && !isNaN(endPoint.y)) {
+            if (Number.isFinite(endPoint.x) && Number.isFinite(endPoint.y)) {
               hitObject.endPos = hitObject.pos.add(endPoint);
             } else {
-              // If endPosition could not be calculated, approximate it by setting it to the last point
-              hitObject.endPos = hitObject.curvePoints[hitObject.curvePoints.length - 1];
+              // If endPosition could not be calculated, 
+              // approximate it by setting it to the last point
+              hitObject.endPos = 
+                hitObject.curvePoints[hitObject.curvePoints.length - 1];
             }
 
             if (edgeHitSounds) {
@@ -302,6 +304,7 @@ class Beatmap {
                 .split("|")
                 .map(v => parseInt(v, 10));
             }
+            
             if (edgeAdditions) {
               hitObject.edgeAdditions = edgeAdditions
                 .split("|")
