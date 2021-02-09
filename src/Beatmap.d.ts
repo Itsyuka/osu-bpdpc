@@ -81,6 +81,7 @@ export default class Beatmap {
   public get countSpinner(): number;
   public get countObjects(): number;
   public get maxCombo(): number;
+  public get length(): number;
 }
 
 export interface Break {

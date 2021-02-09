@@ -574,6 +574,13 @@ class Beatmap {
   get maxCombo() {
     return this.HitObjects.reduce((a, c) => a + c.combo, 0);
   }
+
+  get length() {
+    let first = this.HitObjects[0];
+    let last = this.HitObjects[this.HitObjects.length - 1];
+
+    return last.endTime - first.startTime;
+  }
 }
 
 module.exports = Beatmap;
