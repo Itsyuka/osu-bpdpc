@@ -576,10 +576,12 @@ class Beatmap {
   }
 
   get length() {
-    let first = this.HitObjects[0];
-    let last = this.HitObjects[this.HitObjects.length - 1];
+    let startTime = this.HitObjects[0].startTime;
+    let endTime = this.HitObjects.reduce((time, ho) => {
+      return Math.max(time, ho.endTime || ho.startTime);
+    }, 0);
 
-    return last.endTime - first.startTime;
+    return endTime - startTime;
   }
 }
 
