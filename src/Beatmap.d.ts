@@ -4,6 +4,8 @@ import HitSound from "./Enum/HitSound";
 import Colour from "./Colour";
 
 export default class Beatmap {
+  public Version: number;
+
   public General: {
     AudioFilename: string;
     AudioLeadin: number;
@@ -65,14 +67,21 @@ export default class Beatmap {
   public static fromOsu(data: string): Beatmap;
 
   /**
+   * Returns a string for an .osu file
+   */
+  public toOsu(): string;
+
+  /**
    * Takes a JSON string and returns a new Beatmap instance
    */
   public static fromJSON(data: string): Beatmap;
 
-  /**
-   * Returns a string for an .osu file
-   */
-  public toOsu(): string;
+  public get countNormal(): number;
+  public get countSlider(): number;
+  public get countSpinner(): number;
+  public get countObjects(): number;
+  public get maxCombo(): number;
+  public get length(): number;
 }
 
 export interface Break {

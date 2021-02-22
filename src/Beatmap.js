@@ -282,17 +282,21 @@ class Beatmap {
               hitObject.pathPoints.push(point);
             });
 
-            let sliderPath = new SliderPath(
+            let path = new SliderPath(
               hitObject.pathPoints, hitObject.pixelLength
             );
 
-            let endPoint = sliderPath.positionAt(1);
+            let endPoint = path.positionAt(path.progressAt(hitObject, 1));
             
-            if (endPoint && endPoint.x && endPoint.y) {
+            hitObject.path = path;
+
+            if (Number.isFinite(endPoint.x) && Number.isFinite(endPoint.y)) {
               hitObject.endPos = hitObject.pos.add(endPoint);
             } else {
-              // If endPosition could not be calculated, approximate it by setting it to the last point
-              hitObject.endPos = hitObject.curvePoints[hitObject.curvePoints.length - 1];
+              // If endPosition could not be calculated, 
+              // approximate it by setting it to the last point
+              hitObject.endPos = 
+                hitObject.curvePoints[hitObject.curvePoints.length - 1];
             }
 
             if (edgeHitSounds) {
@@ -300,6 +304,7 @@ class Beatmap {
                 .split("|")
                 .map(v => parseInt(v, 10));
             }
+            
             if (edgeAdditions) {
               hitObject.edgeAdditions = edgeAdditions
                 .split("|")
@@ -363,24 +368,67 @@ class Beatmap {
           break;
       }
     }
-    let parentPoint = beatmap.TimingPoints.find(tp => !tp.inherited);
 
-    for (const tp of beatmap.TimingPoints) {
-      if (!tp.inherited) parentPoint = tp;
+    let tpIndex = -1, nextTime = Number.NEGATIVE_INFINITY;
+    let parentPoint, timingPoint, pixelsPerBeat =  0;
 
-      let bpm = Math.round(60000 / tp.beatLength);
-
-      if (bpm > 0) {
-        beatmap.General.MinBPM = Math.min(beatmap.General.MinBPM, bpm) || bpm;
-        beatmap.General.MaxBPM = Math.max(beatmap.General.MaxBPM, bpm) || bpm;
+    for (const hitObject of beatmap.HitObjects) {
+      if (!(hitObject.hitType & HitType.Slider)) {
+        continue;
       }
+
+      while (hitObject.startTime >= nextTime) {
+        ++tpIndex;
+
+        if (beatmap.TimingPoints.length > tpIndex + 1) {
+          nextTime = beatmap.TimingPoints[tpIndex + 1].time;
+        }
+        else {
+          nextTime = Number.POSITIVE_INFINITY;
+        }
+
+        timingPoint = beatmap.TimingPoints[tpIndex];
+
+        if (timingPoint.inherited) {
+          parentPoint = timingPoint;
+        }
+
+        let bpm = Math.round(60000 / timingPoint.beatLength);
+
+        if (bpm > 0) {
+          beatmap.General.MinBPM = 
+            Math.min(beatmap.General.MinBPM, bpm) || bpm;
+          beatmap.General.MaxBPM = 
+            Math.max(beatmap.General.MaxBPM, bpm) || bpm;
+        }
+
+        let velocityMultiplier = 1;
+    
+        if (!timingPoint.inherited && timingPoint.beatLength < 0) {
+          velocityMultiplier = -100 / timingPoint.beatLength;
+        }
+          
+        pixelsPerBeat = beatmap.Difficulty.SliderMultiplier * 100;
+        
+        if (beatmap.Version >= 8) {
+          pixelsPerBeat *= velocityMultiplier;
+        }
+      }
+
+      let beats = (hitObject.path.distance * hitObject.repeat) / pixelsPerBeat;
+  
+      let ticks = Math.ceil((beats - 0.01) / hitObject.repeat 
+        * beatmap.Difficulty.SliderTickRate) - 1;
       
-      for (let hitObject of beatmap.HitObjects.filter(
-        ho => ho.startTime >= tp.time
-      )) {
-        if (hitObject.finalize) hitObject.finalize(tp, parentPoint, beatmap);
-      }
+      ticks *= hitObject.repeat;
+      ticks += hitObject.repeat + 1;
+
+      hitObject.duration = beats * parentPoint.beatLength;
+      hitObject.endTime = hitObject.startTime + hitObject.duration;
+  
+      hitObject.combo = Math.max(0, ticks);
     }
+
     return beatmap;
   }
 
@@ -525,6 +573,15 @@ class Beatmap {
 
   get maxCombo() {
     return this.HitObjects.reduce((a, c) => a + c.combo, 0);
+  }
+
+  get length() {
+    let startTime = this.HitObjects[0].startTime;
+    let endTime = this.HitObjects.reduce((time, ho) => {
+      return Math.max(time, ho.endTime || ho.startTime);
+    }, 0);
+
+    return endTime - startTime;
   }
 }
 

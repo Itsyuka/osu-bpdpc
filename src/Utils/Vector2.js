@@ -4,6 +4,10 @@ class Vector2 {
     this.y = y;
   }
 
+  equals(vec) {
+    return this.x === vec.x && this.y === vec.y;
+  }
+
   add(vec) {
     return new Vector2(this.x + vec.x, this.y + vec.y);
   }
